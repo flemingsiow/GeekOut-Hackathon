@@ -1,0 +1,150 @@
+<!-- 
+
+		  		  Author:  Fleming Siow
+		   Serial Number:  4
+               	   Class:  DAAA/FT/1B/03
+    	Admission Number:  p2011828
+      	  		    Date:  7th February, 2021
+			    Filename:  addCat.ejs
+
+		
+		
+		ADMIN DASHBOARD | Lets admin add a category listing
+-->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include('partials/head'); %>
+        <title>SPGames | Admin Dashboard | Add Category</title>
+</head>
+
+<body class="fixed-nav sticky-footer" id="page-top">
+
+    <%- include('partials/nav'); %>
+
+        <form class="content-wrapper" id="post-new-cat">
+            <div class="container-fluid">
+                <!-- Breadcrumbs-->
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a href="/dashboard">Dashboard</a>
+                    </li>
+                    <li class="breadcrumb-item active">Add Category</li>
+                </ol>
+
+                <div class="box_general padding_bottom">
+                    <div class="header_box version_2">
+                        <h2><i class="fa fa-file"></i>Basic Info</h2>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Category Name</label>
+                                <input type="text" id="cat-title" class="form-control"
+                                    placeholder="Enter the name of the category...">
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /row-->
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label>Description</label>
+                                <div class="editor" id="cat-desc"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /row-->
+                    <div id="custom-msg"></div>
+                </div>
+                <!-- /box_general-->
+                <p><input type="submit" value="Create" class="btn_1 medium" id="post-game"></p>
+            </div>
+            <!-- /.container-fluid-->
+        </form>
+        <!-- /.container-wrapper-->
+
+        <%- include('partials/footer'); %>
+
+        <!-- Scroll to Top Button-->
+        <a class="scroll-to-top rounded" href="#page-top">
+            <i class="fa fa-angle-up"></i>
+        </a>
+
+
+        
+        <script>
+            $('.editor').summernote({
+                fontSizes: ['10', '14'],
+                toolbar: [
+                    // [groupName, [list of button]]
+                    ['style', ['bold', 'italic', 'underline', 'clear']],
+                    ['font', ['strikethrough']],
+                    ['fontsize', ['fontsize']],
+                    ['para', ['ul', 'ol', 'paragraph']]
+                ],
+                placeholder: 'Write here your description....',
+                tabsize: 2,
+                height: 200
+            });
+        </script>
+
+
+        <!-- POSTING REVIEW -->
+        <script>
+
+            $("#post-new-cat").submit(async (event) => {
+
+                try {
+                    event.preventDefault();
+
+                    /* ===== CREATE NEW CATEGORY ===== */
+
+                    const reqCat = {
+                        catname: $("#cat-title").val(),
+                        description: $($('#cat-desc').summernote('code')).text(),
+                    };
+
+                    const resCatId = await axios.post(`${baseUrl}/category`, reqCat, config);
+                    const catid = resCatId.data.categoryid;
+
+                    // store category name to storage so we know the category has been successfully created
+                    await localStorage.setItem('createdCat', $("#cat-title").val());
+
+                    window.location.href = "/dashboard/catlist";
+
+                } catch (err) {
+
+                    // check if it's an axios error
+                    if (err.response) {
+
+                        let errorMsg;
+                        if (err.response.data.Message === 'The category name provided already exists.') {
+
+                            errorMsg = `
+                            <div class="alert alert-danger alert-dismissible fade show">
+                                <button type="button" class="close" data-dismiss="alert">&times;</button>
+                                <strong>Error!</strong> ${err.response.data.Message}
+                            </div>
+                            `;
+                            await $('#custom-msg').html(errorMsg);
+
+                            $("#cat-title").val('')
+                            $('.note-editable').html('');
+                        };
+                        console.log(err.response.data.Message);
+
+                    } else {
+                        // log error
+                        console.log(err);
+                    };
+                };
+            });
+
+        </script>
+
+
+</body>
+
+</html>

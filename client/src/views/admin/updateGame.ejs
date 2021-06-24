@@ -1,0 +1,521 @@
+<!-- 
+
+		  		  Author:  Fleming Siow
+		   Serial Number:  4
+               	   Class:  DAAA/FT/1B/03
+    	Admission Number:  p2011828
+      	  		    Date:  7th February, 2021
+			    Filename:  updateGame.ejs
+
+		
+		
+		ADMIN DASHBOARD | Lets admin update an existing game listing
+
+-->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<%- include('partials/head'); %>
+	<title>SPGames | Admin Dashboard | Update Game</title>
+</head>
+
+<body class="fixed-nav sticky-footer" id="page-top">
+    
+	<%- include('partials/nav'); %>
+
+    <script>
+
+        const getInfo = async () => {
+
+			try {
+				const url = window.location.toString();
+				const gameid = url.split('/').slice(-1)[0].split('?')[0].split('#')[0];
+
+				/* ===== RETRIEVE PRIOR GAME DETAILS ===== */
+				const resGetGm = await axios.get(`${baseUrl}/game/id/${gameid}`);
+				const game = resGetGm.data;
+
+				const htmlGmTitle = `<input type="text" id="game-title" class="form-control"
+										placeholder="Enter the new name of the game..." value="${game.title}">`;
+
+				const htmlGmYOR = `<input class="form-control" type="number" min="1900" max="3000" step="1"
+										id="year-of-release" placeholder="Year of Release" name="yearofrelease"
+										onkeydown="if(event.key==='.'){event.preventDefault();}" value="${game.year}">`;
+
+				const htmlGmDesc = `<div class="editor" id="game-desc"><p>${game.description}</p></div>`;
+
+				const htmlGmPrice = `<input class="form-control" type="number" min="0.00" step="0.01"
+														id="game-price" placeholder="Price" name="price" value="${game.price}">`;
+
+				const gamepic = game.gamepic.split('/').slice(-1)[0];
+				const htmlGmImg = `<div class="image-area mt-4"><img id="priorGmImg" src="/assets/img/uploads/${gamepic}" 
+									alt="${game.description}" class="img-fluid rounded shadow-sm mx-auto d-block"></div>`
+
+				await $('#game-title-container').append(htmlGmTitle);
+				await $('#yor-container').append(htmlGmYOR);
+				await $('#game-desc-container').append(htmlGmDesc);
+				await $('#game-price-container').append(htmlGmPrice);
+				await $('#priorGmImg-container').append(htmlGmImg);
+
+
+				/* RETRIEVE PRIOR CATEGORIES OF GAME */
+				const priorCatNms = [];
+				for (c of game.categories) {
+					priorCatNms.push(c.catname);
+				};
+
+				/* RETRIEVE ALL CATEGORIES IN DB */
+				const resGetCat = await axios.get(`${baseUrl}/category`);
+				const categories = resGetCat.data;
+
+				let htmlListCat = ``;
+				for (c of categories) {
+					if (priorCatNms.includes(c.catname)) {
+						htmlListCat += `<option selected>${c.catname}</option>`;
+
+					} else {
+						htmlListCat += `<option>${c.catname}</option>`;
+					};
+				};
+				await $('#choices-multiple-remove-button').append(htmlListCat);
+
+				await $('.editor').summernote({
+					fontSizes: ['10', '14'],
+					toolbar: [
+						// [groupName, [list of button]]
+						['style', ['bold', 'italic', 'underline', 'clear']],
+						['font', ['strikethrough']],
+						['fontsize', ['fontsize']],
+						['para', ['ul', 'ol', 'paragraph']]
+					],
+					placeholder: 'Write here your description....',
+					tabsize: 2,
+					height: 200
+				});
+
+				const multipleCancelButton = new Choices('#choices-multiple-remove-button', {
+					removeItemButton: true,
+					placeholder: true,
+					placeholderValue: 'Select category',
+				});
+
+
+				/* RETRIEVE ALL PLATFORMS IN THE DB */
+				const resGetPfs = await axios.get(`${baseUrl}/platforms`);
+				const platforms = resGetPfs.data;
+
+				let htmlListPfs = ``;
+				for (p of platforms) {
+					if (p.platform === game.platform) {
+						htmlListPfs += `<option selected="selected">${p.platform}</option>`;
+						$("[name='game_platform']").val(p.platform)
+
+					} else {
+						htmlListPfs += `<option>${p.platform}</option>`;
+					};
+				};
+
+				await $('#game-platforms').append(htmlListPfs);
+				
+
+				/* LOAD IMAGES */
+				const preloaded = [], priorImgIds = [];
+				for (i of game.images) {
+					if (i.imgname != gamepic) {
+						priorImgIds.push(i.imgid);
+						preloaded.push({ id: i.imgid, src: `/assets/img/uploads/${i.imgname}` })
+					};
+				};
+
+				const imgUpload = $('.input-images').imageUploader({
+					preloaded: preloaded,
+					imagesInputName: 'photos',
+				});
+
+				return priorImgIds;
+
+			} catch (err) {
+
+				// check if it's an axios error
+				if (err.response) {
+					
+					// log axios error
+					console.log(err.response.data.Message);
+					alert(err.response.data.Message);
+
+				} else {
+
+					// log error
+					console.log(err);
+					alert(err);
+				};
+
+			};
+        };
+
+        const getInfoPromise = getInfo();
+
+	</script>
+
+    
+	<form class="content-wrapper" id="update-game">
+		<div class="container-fluid">
+			<!-- Breadcrumbs-->
+			<ol class="breadcrumb">
+				<li class="breadcrumb-item">
+					<a href="/dashboard">Dashboard</a>
+				</li>
+				<li class="breadcrumb-item">
+					<a href="/dashboard/gamelist" id="go_back">Game List</a>
+				</li>
+				<li class="breadcrumb-item active">Update Game</li>
+			</ol>
+			<div class="box_general padding_bottom">
+				<div class="header_box version_2">
+					<h2><i class="fa fa-file"></i>Basic Info</h2>
+				</div>
+				<div class="row">
+					<div class="col-md-6">
+						<div class="form-group" id="game-title-container">
+							<label>Game Title</label>
+						</div>
+					</div>
+					<div class="col-md-6">
+						<div class="form-group">
+							<label>Categories</label>
+							<div>
+								<select id="choices-multiple-remove-button" multiple>
+
+								</select>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- /row-->
+				<div class="row">
+					<div class="col-md-6">
+						<div class="form-group">
+							<label>Platform</label>
+							<div class="styled-select">
+								<input list="game-platforms" name="game_platform" />
+									<datalist id="game-platforms">
+								</datalist>
+							</div>
+						</div>
+					</div>
+					<div class="col-md-6">
+						<div class="form-group">
+							<div class="form-group" id="yor-container">
+								<label>Year of Release</label>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- /row-->
+				<div class="row">
+					<div class="col-md-12">
+						<div class="form-group" id="game-desc-container">
+							<label>Description</label>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- /box_general-->
+
+			<!-- IMAGE BOX -->
+			<div class="box_general padding_bottom">
+				<div class="header_box version_2">
+					<h2><i class="fas fa-images"></i>Images</h2>
+				</div>
+				<!-- /row-->
+				<div class="row">
+					<div class="col-md-12">
+						<div class="form-group">
+							<label>Upload Game Display Image</label>
+							<div class="input-group mb-3 px-2 py-2 rounded-pill bg-light shadow-sm">
+								<input id="upload" type="file" onchange="readURL(this);" class="form-control border-0">
+								<label id="upload-label" for="upload" class="font-weight-light text-muted">Update
+									Photo</label>
+								<div class="input-group-append">
+									<label for="upload" class="btn btn-light m-0 rounded-pill px-4"> <i
+											class="fa fa-cloud-upload mr-2 text-muted"></i><small
+											class="text-uppercase font-weight-bold text-muted">Update
+											Photo</small></label>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+
+				<!-- /row-->
+				<div class="row" style="position: relative;">
+					<div class="col-md-5" id="priorGmImg-container">
+					</div>
+					<div class="col-md-2">
+						<div class="center-con" style="position: absolute; top:35%; right: 50%;">
+							<div class="round">
+								<div id="cta">
+									<span class="arrow primera next bounceAlpha"></span>
+									<span class="arrow segunda next bounceAlpha"></span>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="col-md-5">
+						<div class="image-area mt-4"><img id="imageResult" src="#" alt=""
+								class="img-fluid rounded shadow-sm mx-auto d-block"></div>
+					</div>
+				</div>
+				<p></p>
+
+
+				<!-- /row-->
+				<div class="row">
+					<div class="col-md-12">
+						<form enctype="multipart/form-data">
+							<div class="input-field form-group">
+								<label class="active">Photos</label>
+								<div id="gm-photos" class="input-images" style="padding-top: .5rem;"></div>
+							</div>
+						</form>
+					</div>
+				</div>
+				<!-- /row-->
+
+			</div>
+			<!-- /box_general-->
+
+
+			<div class="box_general padding_bottom">
+				<div class="header_box version_2">
+					<h2><i class="fa fa-dollar"></i>Pricing</h2>
+				</div>
+				<div class="row">
+					<div class="col-md-12">
+						<table id="pricing-list-container" style="width:100%;">
+							<tr class="pricing-list-item">
+								<td>
+									<div class="row">
+										<div class="col-md-3">
+											<div class="form-group" id="game-price-container">
+											</div>
+										</div>
+									</div>
+								</td>
+							</tr>
+						</table>
+					</div>
+				</div>
+				<!-- /row-->
+			</div>
+
+			<!-- Custom Message -->
+			<div id="custom_msg">
+			</div>
+
+			<!-- /box_general-->
+			<p><input type="submit" value="Update" class="btn_1 medium" id="post-game"></p>
+		</div>
+		<!-- /.container-fluid-->
+	</form>
+    <%- include('partials/footer'); %>
+
+
+	<!-- Scroll to Top Button-->
+	<a class="scroll-to-top rounded" href="#page-top">
+		<i class="fa fa-angle-up"></i>
+    </a>
+    
+
+	<script>
+
+		/*  ==========================================
+			SHOW UPLOADED IMAGE
+		* ========================================== */
+		function readURL(input) {
+			if (input.files && input.files[0]) {
+				var reader = new FileReader();
+
+				reader.onload = function (e) {
+					$('#imageResult')
+						.attr('src', e.target.result);
+				};
+				reader.readAsDataURL(input.files[0]);
+			}
+		}
+
+		$(function () {
+			$('#upload').on('change', function () {
+				readURL(input);
+			});
+		});
+
+		/*  ==========================================
+			SHOW UPLOADED IMAGE NAME
+		* ========================================== */
+		var input = document.getElementById('upload');
+		var infoArea = document.getElementById('upload-label');
+
+		input.addEventListener('change', showFileName);
+		function showFileName(event) {
+			var input = event.srcElement;
+			var fileName = input.files[0].name;
+			infoArea.textContent = 'Image name: ' + fileName;
+		}
+
+    </script>
+    
+    <!-- 
+        Checks if src of img was edited. If it is, display the animated css arrow
+    -->
+    <script>
+
+        const img = document.querySelector("#imageResult"),
+			observer = new MutationObserver((changes) => {
+				changes.forEach(change => {
+					if (change.attributeName.includes('src')) {
+						$('.arrow').css('display', 'unset');
+					}
+				});
+			});
+		observer.observe(img, { attributes: true });
+
+    </script>
+
+
+	<!-- UPDATING GAME -->
+	<script>
+	
+		$("#update-game").submit(async (event) => {
+
+			try {
+				event.preventDefault();
+				
+				const url = window.location.toString();
+				const gameid = url.split('/').slice(-1)[0].split('?')[0].split('#')[0];
+
+				/* ===== FRONT END FORM VALIDATION ===== */
+				if (!$('#game-title').val()) { throw new Error('Game title must be filled.');};
+				if (!$('#game-price').val()) { throw new Error('Game price must be filled.');};
+				if (!$("[name='game_platform']").val()) { throw new Error('Platform must be filled.');};
+				if (!$('#year-of-release').val()) { throw new Error('Game year of release must be filled.');};
+
+
+				/* ===== RETRIEVES NEW CATEGORY IDS STATED ===== */
+				const catnames = [...$("#choices-multiple-remove-button").val().toString().split(',')];
+				const catids = [];
+				for (cat of catnames) {
+					const resCat = await axios.get(`${baseUrl}/category/name/${cat}`);
+					catids.push(resCat.data.catid);
+				};
+
+				/* ===== RETRIEVES PRIOR AND NEW IMAGE IDS ===== */
+				const priorImgIds = await getInfoPromise;
+
+				// check for images that were not changed
+				const noChgedImgIds = [];
+				$('.uploaded-image').each(function (i, el) {
+					const imgSrc = $(el).children('img').attr('src')
+					if (imgSrc.toString().substring(0, 4) != 'blob') {
+						noChgedImgIds.push($(el).children('input').attr('value'))
+					};
+				});
+				const removedImgIds = priorImgIds.filter((i) => !noChgedImgIds.includes(i.toString()));
+
+				// remove image records for those that were deleted
+				for (i of removedImgIds) {
+					await axios.delete(`${baseUrl}/image/${i}`, config)
+				};
+
+				// uploads the new images
+				for (i of $('.input-images input').prop('files')) {
+					const reqImg = { img: i, imgDesc: 'Default' };
+
+					const formDataImg = new FormData()
+					Object.keys(reqImg).forEach((key) => {
+						formDataImg.append(key, reqImg[key])
+					});
+					await axios.post(`${baseUrl}/user/${userid}/game/${gameid}/upload`, formDataImg, config);
+				};
+
+
+				/* ===== UPDATE GAME LISTING ===== */
+				const reqGame = {
+					title: $("#game-title").val(),
+					description: $($('#game-desc').summernote('code')).text(),
+					price: $("#game-price").val(),
+					platform: $("[name='game_platform']").val(),
+					categoryids: catids,
+					year: $("#year-of-release").val()
+				};
+
+				if ($('#upload').prop('files')[0] != undefined) {
+					reqGame.img = $('#upload').prop('files')[0];
+				};
+
+				const formDataGm = new FormData();
+				Object.keys(reqGame).forEach((k) => {
+					formDataGm.append(k, reqGame[k])
+				});
+				await axios.put(`${baseUrl}/game/${gameid}`, formDataGm, config);
+
+				// store game title to storage so we know the game has been successfully updated
+				await localStorage.setItem('updatedGame', $("#game-title").val());
+
+				window.location.href = "/dashboard/gamelist";
+
+			} catch (err) {
+
+				let errMsg = err.toString().slice(7);
+
+				// check if it's an axios error
+				if (err.response) {
+					
+					errMsg = err.response.data.Message;
+
+					if (errMsg === 'No Category found with the id name.') { errMsg = 'Category must be filled up. '}
+
+					// log axios error
+					console.log(err.response.data.Message);
+
+				} else {
+
+					// log error
+					console.log(err);
+				};
+
+				const htmlMsg = `
+						<div class="alert alert-danger alert-dismissible fade show">
+							<button type="button" class="close" data-dismiss="alert">&times;</button>
+							<strong>Error!</strong> ${errMsg}
+						</div>
+					`;
+				await $('#custom_msg').html(htmlMsg)
+			};
+		});
+
+	</script>
+
+	<script>
+		$('#go_back').click((event) => {
+			event.preventDefault();
+			
+			const previous = '<%= previous %>'
+			if (previous) {
+				if (previous.toString().split('?')[0].split('#')[0].endsWith('/gamelist')) {
+					window.history.back();
+					
+				} else {
+					window.location.href = '/dashboard/gamelist';
+				};
+			} else {
+				window.location.href = '/dashboard/gamelist';
+			};
+		});
+	</script>
+
+</body>
+
+</html>

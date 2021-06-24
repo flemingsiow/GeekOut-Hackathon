@@ -1,0 +1,33 @@
+{
+  "name": "bed-ca2-assignment",
+  "version": "1.0.0",
+  "description": "SP's Back End Web Development Module CA2",
+  "main": "./src/index.js",
+  "scripts": {
+    "serve": "nodemon /src/main.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "NodeJS",
+    "SQL",
+    "Express",
+    "API",
+    "Front-End",
+    "Axios"
+  ],
+  "author": "Fleming",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.21.1",
+    "cors": "^2.8.5",
+    "dateformat": "^4.4.1",
+    "dotenv": "^8.2.0",
+    "ejs": "^3.1.5",
+    "express": "^4.17.1",
+    "express-session": "^1.17.1",
+    "googleapis": "^67.0.0",
+    "jsonwebtoken": "^8.5.1",
+    "nodemailer": "^6.4.17",
+    "nodemailer-mailgun-transport": "^2.0.2"
+  }
+}

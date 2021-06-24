@@ -1,0 +1,143 @@
+<!-- 
+
+		  		      Author:  Fleming Siow
+		     Serial Number:  4
+               	 Class:  DAAA/FT/1B/03
+    	Admission Number:  p2011828
+      	  		    Date:  7th February, 2021
+			        Filename:  head.ejs
+
+		
+		
+		ADMIN DASHBOARD | Common DOM, styles and scripts for the admin dashboard.
+
+-->
+<% 
+  const gameid = page.split('/').slice(-1)[0].split('?')[0].split('#')[0];
+  if (isNaN(gameid)) {    %>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="SPGames Admin Dashboard">
+    <meta name="author" content="Fleming">
+
+    <!-- Favicons-->
+    <link rel="shortcut icon" href="../assetsAdmin/img/favicon.ico" type="img/x-icon">
+    <link rel="apple-touch-icon" type="img/x-icon" href="../assetsAdmin/img/apple-touch-icon-57x57-precomposed.png">
+    <link rel="apple-touch-icon" type="img/x-icon" sizes="72x72" href="../assetsAdmin/img/apple-touch-icon-72x72-precomposed.png">
+    <link rel="apple-touch-icon" type="img/x-icon" sizes="114x114" href="../assetsAdmin/img/apple-touch-icon-114x114-precomposed.png">
+    <link rel="apple-touch-icon" type="img/x-icon" sizes="144x144" href="../assetsAdmin/img/apple-touch-icon-144x144-precomposed.png">
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700,800" rel="stylesheet">
+
+    <!-- Bootstrap -->
+    <link href="../assetsAdmin/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Choices (Multiselect) -->
+    <script src="https://res.cloudinary.com/dxfq3iotg/raw/upload/v1569006273/BBBootstrap/choices.min.js?version=7.0.0"></script>
+    <link href="https://res.cloudinary.com/dxfq3iotg/raw/upload/v1569006288/BBBootstrap/choices.min.css?version=7.0.0" rel="stylesheet" >
+
+    <!-- CSS Styles -->
+    <link href="../assetsAdmin/css/admin.css" rel="stylesheet">
+    <link href="../assetsAdmin/vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href="../assetsAdmin/vendor/datatables/dataTables.bootstrap4.css" rel="stylesheet">
+    <link href="../assetsAdmin/vendor/dropzone.css" rel="stylesheet">
+    <link href="../assetsAdmin/css/date_picker.css" rel="stylesheet">
+
+    <!-- jQuery Dependencies -->
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="../assetsAdmin/vendor/jquery/jquery.min.js"></script>
+
+    <!-- FontAwesome -->
+    <script src="https://kit.fontawesome.com/4283d891fe.js" crossorigin="anonymous"></script>
+
+    <!-- Axios -->
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+    <!-- Summernote Editor -->
+    <script src="../assetsAdmin/js/editor/summernote-bs4.min.js"></script>
+    <link rel="stylesheet" href="../assetsAdmin/js/editor/summernote-bs4.css">
+
+    <!-- Custom Scripts -->
+    <script src="../assetsAdmin/vendor/chart.js/Chart.min.js"></script>
+    <script src="../assetsAdmin/vendor/datatables/jquery.dataTables.js"></script>
+    <script src="../assetsAdmin/vendor/datatables/dataTables.bootstrap4.js"></script>
+    <script src="../assetsAdmin/vendor/jquery.selectbox-0.2.js"></script>
+    <script src="../assetsAdmin/vendor/retina-replace.min.js"></script>
+    <script src="../assetsAdmin/js/admin.js"></script>
+    <script src="../assetsAdmin/vendor/dropzone.min.js"></script>
+    <script src="../assetsAdmin/vendor/bootstrap-datepicker.js"></script>
+    <script src="../assetsAdmin/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="../assetsAdmin/vendor/jquery-easing/jquery.easing.min.js"></script>
+
+    
+    <script src="https://code.jquery.com/jquery-migrate-1.4.1.min.js"></script>
+
+<% 
+} else {      %>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="SPGames Admin Dashboard">
+    <meta name="author" content="Fleming">
+
+    <!-- Favicons-->
+    <link rel="shortcut icon" href="../../assetsAdmin/img/favicon.ico" type="image/x-icon">
+    <link rel="apple-touch-icon" type="image/x-icon" href="../../assetsAdmin/img/apple-touch-icon-57x57-precomposed.png">
+    <link rel="apple-touch-icon" type="image/x-icon" sizes="72x72" href="../../assetsAdmin/img/apple-touch-icon-72x72-precomposed.png">
+    <link rel="apple-touch-icon" type="image/x-icon" sizes="114x114" href="../../assetsAdmin/img/apple-touch-icon-114x114-precomposed.png">
+    <link rel="apple-touch-icon" type="image/x-icon" sizes="144x144" href="../../assetsAdmin/img/apple-touch-icon-144x144-precomposed.png">
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700,800" rel="stylesheet">
+    <link type="text/css" rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+
+    <!-- Bootstrap -->
+    <link href="../../assetsAdmin/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Choices (Multiselect) -->
+    <script src="https://res.cloudinary.com/dxfq3iotg/raw/upload/v1569006273/BBBootstrap/choices.min.js?version=7.0.0"></script>
+    <link href="https://res.cloudinary.com/dxfq3iotg/raw/upload/v1569006288/BBBootstrap/choices.min.css?version=7.0.0" rel="stylesheet" >
+
+    <!-- CSS Styles -->
+    <link href="../../assetsAdmin/css/admin.css" rel="stylesheet">
+    <link href="../../assetsAdmin/vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+    <link href="../../assetsAdmin/vendor/datatables/dataTables.bootstrap4.css" rel="stylesheet">
+    <link href="../../assetsAdmin/vendor/dropzone.css" rel="stylesheet">
+    <link href="../../assetsAdmin/css/date_picker.css" rel="stylesheet">
+
+    <!-- jQuery Dependencies -->
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="../../assetsAdmin/vendor/jquery-easing/jquery.easing.min.js"></script>
+    <script src="../../assetsAdmin/vendor/jquery/jquery.min.js"></script>
+
+    <!-- FontAwesome -->
+    <script src="https://kit.fontawesome.com/4283d891fe.js" crossorigin="anonymous"></script>
+
+    <!-- Axios -->
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+    <!-- Summernote Editor -->
+    <script src="../../assetsAdmin/js/editor/summernote-bs4.min.js"></script>
+    <link rel="stylesheet" href="../../assetsAdmin/js/editor/summernote-bs4.css">
+
+    <!-- Custom Scripts -->
+    <script src="../../assetsAdmin/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="../../assetsAdmin/vendor/chart.js/Chart.min.js"></script>
+    <script src="../../assetsAdmin/vendor/datatables/jquery.dataTables.js"></script>
+    <script src="../../assetsAdmin/vendor/datatables/dataTables.bootstrap4.js"></script>
+    <script src="../../assetsAdmin/vendor/jquery.selectbox-0.2.js"></script>
+    <script src="../../assetsAdmin/vendor/retina-replace.min.js"></script>
+    <script src="../../assetsAdmin/js/admin.js"></script>
+    <script src="../../assetsAdmin/vendor/dropzone.min.js"></script>
+    <script src="../../assetsAdmin/vendor/bootstrap-datepicker.js"></script>
+    <script src="../../assetsAdmin/vendor/jquery-easing/jquery.easing.min.js"></script>
+
+
+    <script src="https://code.jquery.com/jquery-migrate-1.4.1.min.js"></script>
+<% }; %>

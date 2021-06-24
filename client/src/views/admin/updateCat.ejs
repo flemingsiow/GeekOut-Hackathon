@@ -1,0 +1,217 @@
+<!-- 
+
+		  		  Author:  Fleming Siow
+		   Serial Number:  4
+               	   Class:  DAAA/FT/1B/03
+    	Admission Number:  p2011828
+      	  		    Date:  7th February, 2021
+			    Filename:  updateCat.ejs
+
+		
+		
+		ADMIN DASHBOARD | Lets admin update a category listing
+-->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include('partials/head'); %>
+        <title>SPGames | Admin Dashboard | Update Category</title>
+</head>
+
+<body class="fixed-nav sticky-footer" id="page-top">
+
+    <%- include('partials/nav'); %>
+
+    <script>
+
+        const getInfo = async () => {
+
+			try {
+				const url = window.location.toString();
+				const categoryid = url.split('/').slice(-1)[0].split('?')[0].split('#')[0];
+
+				/* ===== RETRIEVE PRIOR CATEGORY DETAILS ===== */
+				const resGetCt = await axios.get(`${baseUrl}/category/${categoryid}`);
+				const category = resGetCt.data;
+
+				const htmlCtName = `<input type="text" id="category_name" class="form-control"
+										placeholder="Enter the new name of the category..." value="${category.catname}">`;
+
+                const htmlCtDesc = `<div class="editor" id="category_desc"><p>${category.description}</p></div>`;
+
+				await $('#cat_name_container').append(htmlCtName);
+                await $('#category_desc_container').append(htmlCtDesc);
+
+
+				await $('.editor').summernote({
+					fontSizes: ['10', '14'],
+					toolbar: [
+						// [groupName, [list of button]]
+						['style', ['bold', 'italic', 'underline', 'clear']],
+						['font', ['strikethrough']],
+						['fontsize', ['fontsize']],
+						['para', ['ul', 'ol', 'paragraph']]
+					],
+					placeholder: 'Write here your description....',
+					tabsize: 2,
+					height: 200
+				});
+
+			} catch (err) {
+
+				// check if it's an axios error
+				if (err.response) {
+					
+					// log axios error
+					console.log(err.response.data.Message);
+					alert(err.response.data.Message);
+
+				} else {
+
+					// log error
+					console.log(err);
+					alert(err);
+				};
+
+			};
+        };
+
+        getInfo();
+
+	</script>
+
+
+        <form class="content-wrapper" id="update_cat">
+            <div class="container-fluid">
+                <!-- Breadcrumbs-->
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a href="/dashboard">Dashboard</a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <a href="/dashboard/catlist">Category List</a>
+                    </li>
+                    <li class="breadcrumb-item active">Add Category</li>
+                </ol>
+
+                <div class="box_general padding_bottom">
+                    <div class="header_box version_2">
+                        <h2><i class="fa fa-file"></i>Basic Info</h2>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group" id="cat_name_container">
+                                <label>Category Name</label>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /row-->
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group" id="category_desc_container">
+                                <label>Description</label>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /row-->
+  
+
+                <!-- Custom Message -->
+                <div id="custom_msg">
+                </div>
+
+                <!-- /box_general-->
+                <p><input type="submit" value="Update" class="btn_1 medium" id="update_cat"></p>
+            </div>
+            <!-- /.container-fluid-->
+        </form>
+        <!-- /.container-wrapper-->
+
+        <%- include('partials/footer'); %>
+
+        <!-- Scroll to Top Button-->
+        <a class="scroll-to-top rounded" href="#page-top">
+            <i class="fa fa-angle-up"></i>
+        </a>
+        
+        <script>
+            $('.editor').summernote({
+                fontSizes: ['10', '14'],
+                toolbar: [
+                    // [groupName, [list of button]]
+                    ['style', ['bold', 'italic', 'underline', 'clear']],
+                    ['font', ['strikethrough']],
+                    ['fontsize', ['fontsize']],
+                    ['para', ['ul', 'ol', 'paragraph']]
+                ],
+                placeholder: 'Write here your description....',
+                tabsize: 2,
+                height: 200
+            });
+        </script>
+
+
+        <!-- UPDATING CATEGORY -->
+        <script>
+        
+            $("#update_cat").submit(async (event) => {
+
+                try {
+                    event.preventDefault();
+                    
+                    const url = window.location.toString();
+                    const categoryid = url.split('/').slice(-1)[0].split('?')[0].split('#')[0];
+
+                    /* ===== FRONT END FORM VALIDATION ===== */
+                    if (!$('#category_name').val()) { throw new Error('Category name must be filled.');};
+                    if (!$($('#category_desc').summernote('code')).text()) { throw new Error('Category description must be filled.');};
+
+
+                    /* ===== UPDATE CATEGORY LISTING ===== */
+                    const reqCat = {
+                        catname: $("#category_name").val(),
+                        description: $($('#category_desc').summernote('code')).text(),
+                    };
+
+                    await axios.put(`${baseUrl}/category/${categoryid}`, reqCat, config);
+
+                    // store game title to storage so we know the game has been successfully updated
+                    await localStorage.setItem('updatedCat', $("#category_name").val());
+
+                    window.location.href = "/dashboard/catlist";
+
+                } catch (err) {
+
+                    let errMsg = err.toString().slice(7);
+
+                    // check if it's an axios error
+                    if (err.response) {
+                        
+                        errMsg = err.response.data.Message;
+
+                        // log axios error
+                        console.log(err.response.data.Message);
+
+                    } else {
+
+                        // log error
+                        console.log(err);
+                    };
+
+                    const htmlMsg = `
+                            <div class="alert alert-danger alert-dismissible fade show">
+                                <button type="button" class="close" data-dismiss="alert">&times;</button>
+                                <strong>Error!</strong> ${errMsg}
+                            </div>
+                        `;
+                    await $('#custom_msg').html(htmlMsg)
+                };
+            });
+
+        </script>
+
+
+</body>
+
+</html>

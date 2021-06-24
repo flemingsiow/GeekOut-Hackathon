@@ -1,0 +1,56 @@
+<!-- 
+
+		  		  Author:  Fleming Siow
+		   Serial Number:  4
+               	   Class:  DAAA/FT/1B/03
+    	Admission Number:  p2011828
+      	  		    Date:  7th February, 2021
+			    Filename:  registrationSuccess.ejs
+
+		
+		
+        Returns registraion success page after the user has clicked on the link sent to their email to verify their account.
+        This page lets the user knows that their account has been successfully registered and directs them to the login page.
+
+-->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include('partials/head'); %>
+    <title>SPGames | Confirm Email</title>
+
+</head>
+
+<body>
+	
+	<div id="page">
+		
+    <%- include('partials/nav'); %>
+	
+	<main>
+	<div id="confirm_email">
+			<div class="container">
+				<div class="row justify-content-center text-center">
+					<div class="col-xl-7 col-lg-9">
+						<h2 style="font-size: 4.75rem">Thanks! <i class="fas fa-dove"></i></h2>
+						<p>Your registration is completed. You can login to SPGames by clicking the button below.</p>
+						<p class="btn_home_align" style="text-align: center;"><a href="/login" class="btn_1 rounded">Login</a></p>
+					</div>
+				</div>
+				<!-- /row -->
+			</div>
+			<!-- /container -->
+		</div>
+		<!-- /error_page -->
+	</main>
+	<!--/main-->
+	
+	<%- include('partials/footer'); %>
+	</div>
+	<!-- page -->
+	
+	<div id="toTop"></div><!-- Back to top button -->
+	
+</body>
+</html>

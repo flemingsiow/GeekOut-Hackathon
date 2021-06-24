@@ -1,0 +1,113 @@
+<!-- 
+
+		  		  Author:  Fleming Siow
+		   Serial Number:  4
+               	   Class:  DAAA/FT/1B/03
+    	Admission Number:  p2011828
+      	  		    Date:  7th February, 2021
+			    Filename:  login.ejs
+
+		
+		
+        Login page for SPGames.
+
+-->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include('partials/head'); %>
+    <title>SPGames | Login</title>
+
+</head>
+
+<body id="login_bg">
+
+    <nav id="menu" class="fake_menu"></nav>
+
+    <div id="preloader">
+        <div data-loader="circle-side"></div>
+    </div>
+    <!-- End Preload -->
+
+    <div id="login">
+        <aside>
+            <figure>
+                <a href="/"><img src="/assets/img/logo_sticky.png" width="155" height="36"
+                        data-retina="true" alt="" class="logo_sticky img-fluid"></a>
+            </figure>
+
+
+            <!-- Login Form -->
+            <form id='login-form' method="POST" action='/login'>
+
+                <!-- Login with Social Media (WIP) -->
+                <div class="access_social">
+                    <a href="https://www.facebook.com" class="social_bt facebook bg-secondary">Login with Facebook</a>
+                    <a href="/oauthGoogle" class="social_bt google bg-secondary">Login with Google</a>
+                    <a href="https://www.twitter.com" class="social_bt linkedin bg-secondary">Login with Linkedin</a>
+                </div>
+
+                <div class="divider"><span>Or</span></div>
+
+                <!-- Login with SPGames -->
+                <div class="form-group">
+                    <label>Username or Email</label>
+                    <input type="text" class="form-control" name="usernameoremail" id="username_or_email">
+                    <i class="icon_mail_alt"></i>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" class="form-control" name="password" id="password" autocomplete="on">
+                    <i class="icon_lock_alt"></i>
+                </div>
+
+                
+                <div class="clearfix add_bottom_30">
+                    <!-- Remember Me Button (WIP) -->
+                    <div class="checkboxes float-left">
+                        <label class="container_check">Remember me
+                            <input type="checkbox" id='remember_me'>
+                            <span class="checkmark"></span>
+                        </label>
+                    </div>
+
+                    <!-- Recover Password (WIP) -->
+                    <div class="float-right mt-1"><a id="forgot" href="javascript:void(0);">Forgot Password?</a></div>
+                </div>
+
+                <% 
+                    if(error) { %>
+                        <!-- Custom Error Message -->
+                        <div id="custom-error-msg">
+                            <div class="alert alert-danger alert-dismissible fade show">
+                                <button type="button" class="close" data-dismiss="alert">&times;</button>
+                                <strong>Error!</strong> <%= error %>
+                            </div>
+                        </div>
+                <%  }; %>
+                    
+
+                <!-- Login Button -->
+                <input type="submit" value="Login" class="btn_1 rounded full-width" style="width: 100%">
+
+                <!-- Sign Up -->
+                <div class="text-center add_top_10">New to SPGames? <strong><a href="/register">Sign up!</a></strong>
+
+                </div>
+            </form>
+            <!--/end Login Form -->
+
+            <div class="copy">© 2021 Fleming Siow</div>
+        </aside>
+    </div>
+    <!-- /login -->
+
+    <!-- Scripts -->
+    <script src="../assets/js/common_scripts.js"></script>
+    <script src="../assets/js/main.js"></script>
+    <script src="../assets/js/validate.js"></script>
+
+</body>
+
+</html>

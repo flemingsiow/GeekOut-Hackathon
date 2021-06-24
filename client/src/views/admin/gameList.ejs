@@ -1,0 +1,255 @@
+<!-- 
+
+		  		  Author:  Fleming Siow
+		   Serial Number:  4
+               	   Class:  DAAA/FT/1B/03
+    	Admission Number:  p2011828
+      	  		    Date:  7th February, 2021
+			    Filename:  gameList.ejs
+
+		
+		
+		ADMIN DASHBOARD | Displays all game listings
+-->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include('partials/head'); %>
+    <title>SPGames | Admin Dashboard | Game Listing</title>
+</head>
+
+<body class="fixed-nav sticky-footer" id="page-top">
+
+    <%- include('partials/nav'); %>
+
+
+    <div class="content-wrapper">
+        <div class="container-fluid">
+            <!-- Breadcrumbs-->
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">
+                    <a href="/dashboard">Dashboard</a>
+                </li>
+                <li class="breadcrumb-item active">Games List</li>
+            </ol>
+
+            <div id="custom_msg">
+            </div>
+
+            <!-- Custom Message -->
+            <script>
+                const customMsg = async () => {
+
+                    try {
+
+                        const createdGame = localStorage.getItem('createdGame');
+                        const updatedGame = localStorage.getItem('updatedGame');
+                        const deletedGame = localStorage.getItem('deletedGame');
+
+                        if (createdGame) {
+
+                            localStorage.removeItem('createdGame');
+                            
+                            const htmlCM = `
+                                <div class="alert alert-success alert-dismissible w-50">
+                                    <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                                    <strong>Success!</strong> ${createdGame} game listing was added.
+                                </div>
+                            `;
+                            await $('#custom_msg').append(htmlCM);
+                        
+                        } else if (updatedGame) {
+
+                            localStorage.removeItem('updatedGame');
+
+                            const htmlCM = `
+                                <div class="alert alert-success alert-dismissible w-50">
+                                    <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                                    <strong>Success!</strong> ${updatedGame} game listing was updated.
+                                </div>
+                            `;
+                            await $('#custom_msg').append(htmlCM);
+
+                        } else if (deletedGame) {
+
+                            localStorage.removeItem('deletedGame');
+
+                            const htmlCM = `
+                                <div class="alert alert-success alert-dismissible w-50">
+                                    <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                                    <strong>Success!</strong> ${deletedGame} game listing was deleted.
+                                </div>
+                            `;
+                            await $('#custom_msg').append(htmlCM);
+
+                        };
+
+                    } catch (err) {
+                        console.log(err);
+                    };
+                };
+
+                customMsg();
+
+            </script>
+
+            <div class="box_general">
+
+
+                <div class="header_box">
+                    <h2 class="d-inline-block">Game Listings</h2>
+                    <div class="filter">
+                        <select name="orderby" class="selectbox">
+                            <option value="Any time">Any time</option>
+                            <option value="Latest">Latest</option>
+                            <option value="Oldest">Oldest</option>
+                        </select>
+                    </div>
+                </div>
+
+
+                <div class="list_general">
+                    <ul id="list-games">
+                        <% games.forEach((game)=> { %>
+                            <li>
+                                <figure style="background-color: black;">
+                                    <img src="../assets/img/uploads/<%= game.gamepic.split('/').pop(); %>"
+                                        alt="<%= game.title %>">
+                                </figure>
+                                <small>
+                                    <%= game.categories.map(c=> c.catname).join(', ') %>
+                                </small>
+                                <h4>
+                                    <%= game.title %>
+                                </h4>
+                                <div class="wrapper-desc">
+                                    <p style="max-width: 70%;">
+                                        <%= game.description %>
+                                    </p>
+                                </div>
+                                <br/>
+                                <p>
+                                    <a href="/dashboard/updategame/<%= game.gameid %>" class="btn_1 gray update-game"
+                                        style="margin-right: 10px;">
+                                        <i class="fa fa-fw fa-eye"></i> Update game</a>
+                                </p>
+                                <ul class="buttons">
+                                    <li>
+                                        <a href="/" class="btn_1 gray delete wishlist_close" 
+                                                data-toggle="modal" data-target="#deleteModal<%= parseInt(game.gameid) %>">
+                                        <i class="fa fa-fw fa-times-circle-o"></i> Delete</a>
+                                    </li>
+                                </ul>
+                            </li>
+
+                        <% }); %>
+                    </ul>
+                </div>
+            </div>
+            <!-- /box_general-->
+            <nav aria-label="...">
+                <ul class="pagination pagination-sm add_bottom_30">
+                    <% if (pagination.previousPage) { %>
+                        <li class="page-item">
+                            <a class="page-link" href="/dashboard/gamelist?page=<%= parseInt(pagination.currentPage) - 1 %>" 
+                                tabindex="-1">Previous</a>
+                        </li>
+                    <% } else if (pagination.totalResults !== 0) { %>
+                        <li class="page-item disabled">
+                            <a class="page-link" href="#" tabindex="-1">Previous</a>
+                        </li>
+                    <% }; %>
+
+                    <% for(i = 1; i <= parseInt(pagination.totalPages); i++) { 
+                        
+                        if (parseInt(pagination.currentPage) === i) { %>
+                            <li class="page-item active"><a class="page-link" href="/dashboard/gamelist?page=<%= i %>"><%= i %></a></li>
+                    <% } else { %>
+                            <li class="page-item"><a class="page-link" href="/dashboard/gamelist?page=<%= i %>"><%= i %></a></li>
+                    <% }; 
+                    }; %>
+
+                    <% if (pagination.nextPage) { %>
+                        <li class="page-item">
+                            <a class="page-link" href="/dashboard/gamelist?page=<%= parseInt(pagination.currentPage) + 1 %>"
+                                tabindex="-1">Next</a>
+                        </li>
+                    <% } else if (pagination.totalResults !== 0) { %>
+                        <li class="page-item disabled">
+                            <a class="page-link" href="#">Next</a>
+                        </li>
+                    <% }; %>
+                </ul>
+            </nav>
+            <!-- /pagination-->
+        </div>
+        <!-- /container-fluid-->
+    </div>
+    <!-- /container-wrapper-->
+    <%- include('partials/footer'); %>
+
+
+    <!-- Scroll to Top Button-->
+    <a class="scroll-to-top rounded" href="#page-top">
+        <i class="fa fa-angle-up"></i>
+    </a>
+
+
+    <% games.forEach((game)=> { %>
+        <!-- Delete Modal -->
+        <div class="modal fade" id="deleteModal<%= parseInt(game.gameid) %>" tabindex="-1"
+            role="dialog" aria-labelledby="deleteModal<%= parseInt(game.gameid) %>" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Confirm Deletion</h5>
+                        <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">Select "Delete" below if you wish to delete the <strong><%= game.title %></strong> game.
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                        <a class="btn btn-primary delete_game" href="#" data-index="<%= game.gameid %>" data-name="<%= game.title %>">Delete</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <% }); %>
+        
+    <!-- Delete Game -->
+    <script>
+        
+        $(document).on('click', '.delete_game', async function (event) {
+            
+            try {
+                event.preventDefault();
+
+                await axios.delete(`${baseUrl}/game/${parseInt($(this).attr('data-index'))}`, config);
+
+                // store game title to storage so we know the game has been successfully deleted
+				await localStorage.setItem('deletedGame', $(this).attr('data-name'));
+
+                window.location.reload();
+                
+            } catch (err) {
+              
+                // check if it's an axios error
+                if (err.response) {
+                    console.log(err.response.data.Message);
+
+                } else {
+                    // log error
+                    console.log(err);
+                };
+                
+            };
+        });
+
+    </script>
+
+</body>
+
+</html>

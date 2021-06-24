@@ -1,0 +1,180 @@
+<!-- 
+
+		  		  Author:  Fleming Siow
+		   Serial Number:  4
+               	   Class:  DAAA/FT/1B/03
+    	Admission Number:  p2011828
+      	  		    Date:  7th February, 2021
+			    Filename:  nav.ejs
+
+		
+		
+		Common navigation for all public accessible pages, excluding the login and registration pages.
+
+-->
+<script>
+
+    const baseUrl = '<%= baseUrl %>';
+
+    const token = ('<%= token %>') ? '<%= token %>' : null;
+    const userid = ('<%= user.userid %>') ? parseInt('<%= user.userid %>') : null
+    const type = ('<%= user.type %>') ? '<%= user.type %>' : null
+    const username = ('<%= user.username %>') ? '<%= user.username %>' : null
+    const email = ('<%= user.email %>') ? '<%= user.email %>' : null
+
+    const config = {
+		headers: { "Authorization": `Bearer ${token}` }
+	};
+
+    $(document).ready(async () => {
+
+        try {
+
+            /* ===== CHECK IF USER IS LOGGED IN ===== */
+            if (token === null || userid === null) {
+
+                const htmlNav = `<li>
+                                    <span>
+                                        <a href="/login" title="Login"><i style="font-size: 20px;" class="fas fa-sign-in-alt"></i></a>
+                                    </span>
+                                </li>`;
+
+                $('#nav-btn').append(htmlNav);
+
+            } else {
+
+                const htmlNav = `
+                    <!-- Cart -->
+                    <li><span><a href="/cart" title="Cart"><i style="font-size: 20px;" class="fab fa-opencart"></i></a></span></li>
+
+                    <!-- Wishlist -->
+                    <li><span><a href="/wishlist" title="Wishlist"><i style="font-size: 20px;" class="far fa-heart"></i></a></span></li>`;
+            
+                    
+
+                await $('#nav-btn').append(htmlNav);
+
+                /* ===== GET DETAILS ON THE USER CURRENTLY LOGGED IN ===== */
+                const resUsr = await axios.get(`${baseUrl}/users/${userid}`);
+                const user = resUsr.data;
+
+                // html to append (user details)
+                const htmlAcc = `
+                    <!-- User -->
+                    <li>
+                        <span>
+                            <a href="/profile">
+                                <img class="rounded-circle" style="width: 27px; height: 27px;" 
+                                    src="../assets/img/user_profiles/${user.profile_pic_url.split('/').slice(-1)[0]}">
+                                <small style="margin-left: 5px;">${user.username}</small>
+                            </a>
+                        </span>
+                        <ul id="user-dropdown">
+                            <li><a href="/">Account</a></li>
+                            <li><a href="/">Redeem Code</a></li>
+                            <li><a href="/logout" id="sign-out">Sign Out</a></li>
+                        </ul>
+                    </li>`;
+
+                $('#nav-btn').prepend(htmlAcc);
+
+                /* ===== CHECK IF USER CAN ACCESS DASHBOARD (ADMIN) ===== */
+                if (type === 'Admin') {
+                    const htmlDB = `<li><a href="/dashboard">Dashboard</a></li>`
+                    await $('#user-dropdown').prepend(htmlDB);
+                };
+            };
+
+        } catch (err) {
+
+            // check if it's an axios error
+            if (err.response) {
+                console.log(err.response.data.Message);
+
+            } else {
+                // log error
+                console.log(err);
+            };
+        };
+    });
+
+</script>
+
+<header class="header menu_fixed">
+
+    <div id="preloader">
+        <div data-loader="circle-side"></div>
+    </div><!-- /Page Preload -->
+
+    <div id="logo">
+        <a href="/">
+            <img src="/assets/img/logo.png" width="150" height="36" alt="" class="logo_normal img-fluid">
+            <img src="/assets/img/logo_sticky.png" width="150" height="36" alt="" class="logo_sticky img-fluid">
+        </a>
+    </div>
+
+    <!-- /top_menu -->
+    <a href="#menu" class="btn_mobile">
+        <div class="hamburger hamburger--spin" id="hamburger">
+            <div class="hamburger-box">
+                <div class="hamburger-inner"></div>
+            </div>
+        </div>
+    </a>
+
+    <nav id="menu-btn" class="main-menu" style="padding-left: 30px;">
+        <ul id='nav-btn'>
+
+        </ul>
+    </nav>
+
+    <nav id="menu" class="main-menu">
+        <ul id='nav-container'>
+
+            <!-- Home Page-->
+            <li><span><a href="/">Home</a></span></li>
+
+            <!-- Game Pages -->
+            <li><span><a href="/games">Games</a></span>
+            </li>
+
+            <!-- Category Pages -->
+            <li><span><a href="/news">News</a></span>
+            </li>
+
+            <!-- Promotion Pages -->
+            <li><span><a href="/promotions">Promotions</a></span>
+            </li>
+
+            <% if (token !== null) { %>
+                <!-- User Account -->
+                <li class="nav_unshown">
+                    <span><a href="/profile">Account: <%= user.username %></a></span>
+                    <ul id="user-dropdown">
+                        <% if (user.type === 'Admin') { %>
+                        <li><a href="/dashboard">Dashboard</a></li>
+                        <% }; %>
+                        <li><a href="/">Account</a></li>
+                        <li><a href="/">Redeem Code</a></li>
+                        <li><a href="/logout" id="sign-out">Sign Out</a></li>
+                    </ul>
+                </li>
+
+                <!-- Cart -->
+                <li class="nav_unshown"><span><a href="/cart">Cart</a></span></li>
+
+                <!-- Wishlist -->
+                <li class="nav_unshown"><span><a href="/wishlist">Wishlist</a></span></li>
+
+            <% } else { %>
+
+                <!-- Cart -->
+                <li class="nav_unshown"><span><a href="/login">Login</a></span></li>
+
+            <% }; %>
+
+        </ul>
+    </nav>
+
+</header>
+<!-- /header -->

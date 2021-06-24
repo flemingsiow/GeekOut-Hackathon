@@ -1,0 +1,338 @@
+<!-- 
+
+		  		  Author:  Fleming Siow
+		   Serial Number:  4
+               	   Class:  DAAA/FT/1B/03
+    	Admission Number:  p2011828
+      	  		    Date:  7th February, 2021
+			    Filename:  addProm.ejs
+
+		
+		
+		ADMIN DASHBOARD | Lets admin add a promotion listing
+-->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+	<%- include('partials/head'); %>
+
+	<!-- Selectize -->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.6/js/standalone/selectize.min.js" integrity="sha256-+C0A5Ilqmu4QcSPxrlGpaZxJ04VjsRjKu+G82kl5UJk=" crossorigin="anonymous"></script>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.6/css/selectize.bootstrap3.min.css" integrity="sha256-ze/OEYGcFbPRmvCnrSeKbRTtjG4vGLHXgOqsyLFTRjg=" crossorigin="anonymous" />
+
+
+	<title>SPGames | Admin Dashboard | Add Promotion</title>
+
+</head>	
+
+</head>
+
+<body class="fixed-nav sticky-footer" id="page-top">
+
+	<%- include('partials/nav'); %>
+
+		<form class="content-wrapper" id="post_new_prom">
+			<div class="container-fluid">
+				<!-- Breadcrumbs-->
+				<ol class="breadcrumb">
+					<li class="breadcrumb-item">
+						<a href="/dashboard">Dashboard</a>
+					</li>
+					<li class="breadcrumb-item active">Add Promotion</li>
+				</ol>
+				<div class="box_general padding_bottom">
+					<div class="header_box version_2">
+						<h2><i class="fa fa-file"></i>Basic Info</h2>
+					</div>
+					<div class="row">
+						<div class="col-md-6">
+							<div class="form-group">
+								<label>Promotion Name</label>
+								<input type="text" id="prom_name" class="form-control"
+									placeholder="Enter the name of the promotion...">
+							</div>
+						</div>
+						<div class="col-md-6">
+							<div class="form-group">
+								<label>Game</label>
+								<div class="styled-selectf">
+									<select id="game_list">
+										<option disabled selected value> Select a Game for the Promotion </option>
+										<% 
+										const gameids = games.map(g => g.gameid);
+										const agameids = promotions.map(p => p.gameid);
+										const ugameids = gameids.filter(g => !agameids.includes(g));
+										%>
+										<% games.forEach((game) => { 
+											if (ugameids.includes(game.gameid)) { %>
+											<option data-data='{"index": <%= game.gameid %>}'><%= game.title %></option>
+										<% 	}
+										}); %>
+									</select>
+								</div>
+							</div>
+						</div>
+
+						<!-- Promotion Date Range -->
+						<div class="col-md-12">
+							<div class="form-group">
+								<label>Date Range</label>
+								<input class="form-control" type="text" name="dates" id="date" placeholder="When.." autocomplete="off">
+							</div>
+						</div>
+
+					</div>
+				</div>	
+
+				<div class="box_general padding_bottom">
+
+					<div class="header_box version_2">
+						<h2><i class="fas fa-image"></i></i>Images</h2>
+					</div>
+
+					<div class="row">
+						<div class="col-md-12 form-group">
+							<label>Upload Promotion Display Image</label>
+							<div class="input-group mb-3 px-2 py-2 rounded-pill bg-light shadow-sm">
+								<input id="upload" type="file" onchange="readURL(this);" class="form-control border-0">
+								<label id="upload-label" for="upload" class="font-weight-light text-muted">Choose
+									file</label>
+								<div class="input-group-append">
+									<label for="upload" class="btn btn-light m-0 rounded-pill px-4"> <i
+											class="fa fa-cloud-upload mr-2 text-muted"></i><small
+											class="text-uppercase font-weight-bold text-muted">Choose
+											file</small></label>
+								</div>
+							</div>
+						</div>
+
+						<div class="col-md-6">
+							<div class="image-area mt-4"><img id="imageResult" src="#" alt=""
+									class="img-fluid rounded shadow-sm mx-auto d-block"></div>
+						</div>
+					</div>
+
+				</div>
+
+
+					
+				<div class="box_general padding_bottom">
+					<div class="header_box version_2">
+						<h2><i class="fa fa-dollar"></i>Pricing</h2>
+					</div>
+					<div class="row">
+						<div class="col-md-12">
+							<table id="pricing-list-container" style="width:100%;">
+								<tr class="pricing-list-item">
+									<td>
+										<div class="row">
+											<div class="col-md-3">
+												<div class="form-group">
+													<label>Discount (%)</label>
+													<input class="form-control" type="number" min="1" max="100" step="0.1"
+														id="prom_discount" placeholder="Discount" name="price">
+												</div>
+											</div>
+										</div>
+									</td>
+								</tr>
+							</table>
+						</div>
+					</div>
+					<!-- /row-->
+				</div>
+
+				<!-- Custom Message -->
+				<div id="custom_msg">
+                </div>
+
+				<!-- /box_general-->
+				<p><input type="submit" value="Create" class="btn_1 medium" id="post-game"></p>
+			</div>
+			<!-- /.container-fluid-->
+		</form>
+
+		<%- include('partials/footer'); %>
+		<!-- /.container-wrapper-->
+
+
+		<!-- Scroll to Top Button-->
+		<a class="scroll-to-top rounded" href="#page-top">
+			<i class="fa fa-angle-up"></i>
+		</a>
+		
+		<!-- Summernote Text Editor -->
+		<script>
+			$('.editor').summernote({
+				fontSizes: ['10', '14'],
+				toolbar: [
+					// [groupName, [list of button]]
+					['style', ['bold', 'italic', 'underline', 'clear']],
+					['font', ['strikethrough']],
+					['fontsize', ['fontsize']],
+					['para', ['ul', 'ol', 'paragraph']]
+				],
+				placeholder: 'Write here your description....',
+				tabsize: 2,
+				height: 200
+			});
+		</script>
+
+		<script>
+
+			/*  ==========================================
+				SHOW UPLOADED IMAGE
+			* ========================================== */
+			function readURL(input) {
+				if (input.files && input.files[0]) {
+					var reader = new FileReader();
+
+					reader.onload = function (e) {
+						$('#imageResult')
+							.attr('src', e.target.result);
+					};
+					reader.readAsDataURL(input.files[0]);
+				}
+			}
+
+			$(function () {
+				$('#upload').on('change', function () {
+					readURL(input);
+				});
+			});
+
+			/*  ==========================================
+				SHOW UPLOADED IMAGE NAME
+			* ========================================== */
+			var input = document.getElementById('upload');
+			var infoArea = document.getElementById('upload-label');
+
+			input.addEventListener('change', showFileName);
+			function showFileName(event) {
+				var input = event.srcElement;
+				var fileName = input.files[0].name;
+				infoArea.textContent = 'File name: ' + fileName;
+			}
+
+		</script>
+
+
+		<!-- ===== POSTING PROMOTION ===== -->
+		<script>
+			$("#post_new_prom").submit(async (event) => {
+
+				try {
+					event.preventDefault();
+					console.log($('.selectize-dropdown-content .selected').attr('data-index'))
+					/* ===== CREATE PROMOTION LISTING ===== */
+
+					if (!$('#prom_name').val()) { throw new Error('Promotion name must be filled.');};
+					if (!$('.selectize-dropdown-content .selected').attr('data-index')) { throw new Error('Game must be filled.');};
+					if (!$('#date').val()) { throw new Error('Date range must be filled.');};
+					if (!$('#prom_discount').val()) { throw new Error('Promotion discount must be filled.');};
+					if (!$('#upload').prop('files')[0]) { throw new Error('You need to upload an image.') }
+
+					const reqProm = {
+						gameid: $('.selectize-dropdown-content .active').attr('data-index'),
+						promname: $('#prom_name').val(),
+						discount: parseInt($('#prom_discount').val())/100,
+						sdate: $('#date').val().split(' > ')[0],
+						edate: $('#date').val().split(' > ')[1],
+						img: $('#upload').prop('files')[0]
+					};
+
+					const formData = new FormData()
+					Object.keys(reqProm).forEach((key) => {
+						formData.append(key, reqProm[key]);
+					});
+
+					const resPmId = await axios.post(`${baseUrl}/promotions`, formData, config);
+					const promotionid = resPmId.data.gameid;
+
+					// store promotion name to storage so we know the promotion has been successfully created
+					await localStorage.setItem('createdProm', $('#prom_name').val());
+
+					window.location.href = "/dashboard/promlist";
+
+
+				} catch (err) {
+
+					let errMsg = err.toString().slice(7);
+
+					// check if it's an axios error
+					if (err.response) {
+						
+						errMsg = err.response.data.Message;
+
+						// log axios error
+						console.log(err.response.data.Message);
+
+					} else {
+
+						// log error
+						console.log(err);
+					};
+
+					const htmlMsg = `
+							<div class="alert alert-danger alert-dismissible fade show">
+								<button type="button" class="close" data-dismiss="alert">&times;</button>
+								<strong>Error!</strong> ${errMsg}
+							</div>
+						`;
+					await $('#custom_msg').html(htmlMsg)
+				};
+			});
+
+		</script>
+
+		<!-- DATEPICKER  -->
+		<script>
+			$(() => {
+				'use strict';
+				$('input[name="dates"]').daterangepicker({
+					autoUpdateInput: false,
+					locale: {
+						cancelLabel: 'Clear'
+					}
+				});
+				$('input[name="dates"]').on('apply.daterangepicker', function (ev, picker) {
+					$(this).val(picker.startDate.format('YYYY/MM/DD') + ' > ' + picker.endDate.format('YYYY/MM/DD'));
+				});
+				$('input[name="dates"]').on('cancel.daterangepicker', function (ev, picker) {
+					$(this).val('');
+				});
+			});
+
+			// Range DatePicker scroll fix
+			$(function () {
+				$(window).bind("resize", function () {
+					if ($(this).width() < 768) {
+						$('.input-dates').removeClass('scroll-fix')
+					} else {
+						$('.input-dates').addClass('scroll-fix')
+					}
+				}).trigger('resize');
+			});
+		</script>
+		
+		<script>
+			$(document).ready(function () {
+				$('select').selectize({
+					sortField: 'text',
+					render: {
+						option: function (data, escape) {
+							return `<div data-index=${escape(data.index)}> ${  escape(data.text)} </div>`
+						}
+					}
+				});
+			});
+
+		</script>
+
+
+</body>
+
+</html>

@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+
+	<!-- 
+
+		  		  Author:  Fleming Siow
+		   Serial Number:  4
+               	   Class:  DAAA/FT/1B/03
+    	Admission Number:  p2011828
+      	  		    Date:  7th February, 2021
+			    Filename:  gameGrid.ejs
+
+		
+		
+		Displays game listings in a grid like format. User may retrieve all game listings or limit results by searching.
+
+	-->
+	
+	<%- include('partials/head'); %>
+	<title>SPGames | Game Listings</title>
+
+</head>
+
+<body>
+
+
+	<div id="page">
+
+		<%- include('partials/nav'); %>
+
+		<main>
+
+			<section class="hero_in tours">
+				<div class="wrapper">
+					<div class="container">
+						<h1 class="fadeInUp"><span></span>Game Catalogue</h1>
+					</div>
+				</div>
+			</section>
+			<!--/hero_in-->
+
+			<div class="filters_listing sticky_horizontal">
+				<div class="container">
+					<ul class="clearfix">
+						<li>
+							<div class="switch-field">
+								<input type="radio" id="all" name="listing_filter" value="all" checked data-filter="*"
+									class="selected">
+								<label for="all">All</label>
+								<input type="radio" id="popular" name="listing_filter" value="popular"
+									data-filter=".popular">
+								<label for="popular">Popular</label>
+								<input type="radio" id="latest" name="listing_filter" value="latest"
+									data-filter=".latest">
+								<label for="latest">Latest</label>
+							</div>
+						</li>			
+					</ul>
+				</div>
+				<!-- /container -->
+			</div>
+			<!-- /filters -->
+
+			<div class="container margin_60_35">
+				<!-- FORM — Search Games -->
+			<form class="search_container" method="POST" action='/games'>
+
+				<div class="container-fluid">
+
+					<div class="row">
+						<div class="col-10">
+							<% if (!games) { games = []; }; 
+							   if (!pagination.totalResults) { pagination.totalResults = 0; } 
+							   const resultTxt = (parseInt(pagination.totalResults) === 1) ? 'result' : 'results'; %>
+							<h4><strong><%= pagination.totalResults %></strong> <%= resultTxt %></h4>
+						</div>
+						<div class="col-2">
+							<a style="cursor: pointer;" class="search_map">
+								<i class="fab fa-searchengin fa-flip-horizontal"></i>
+							</a> <!-- /open search panel -->
+						</div>
+					</div>
+	 
+	 
+					<!-- /row -->
+					<div class="search_map_wp">
+						<div class="custom-search-input-2 map_view">
+
+							<!-- Search by Name -->
+							<div class="form-group">
+								<input class="form-control" type="text" id="searchGame" value="<%= search.searchGame %>"
+									placeholder="Search for a game..." name="searchGame">
+								<i class="icon_search"></i>
+							</div>
+
+							<!-- Search by Max Price -->
+							<div class="form-group">
+								<input class="form-control" type="number" min="0.00" step="0.01" id="max-price"
+									placeholder="Price" name="price" value="<%= search.price %>">
+								<i class="fas fa-comment-dollar"></i>
+							</div>
+
+							<!-- Search by Year Range -->
+							<div class="form-group">
+								<input class="form-control" type="text" name="dates" value="<%= search.dates %>" 
+										id="date" placeholder="When.." autocomplete="off">
+								<i class="icon_calendar"></i>
+							</div>
+
+							<!-- Search by Platform -->
+							<select class="wide" id="platform" name="platform">
+								<option>All Platforms</option>
+								<% platforms.forEach((p) => { 
+									
+									if (p.platform === search.platform) { %>
+										<option selected><%= p.platform %></option>
+
+								<% 	} else { %>
+										<option><%= p.platform %></option>
+								<%	};
+								}); %>
+							</select>
+							<br/><br/><br/>
+							
+							<!-- Search by Categories -->
+							<select id="choices-multiple-remove-button" name="categories" value="Test" multiple>
+								<% categories.forEach((category) => { 
+										if (search.categories) {
+											if (search.categories.includes(category.categoryid.toString())) { %>
+												<option selected value="<%= category.categoryid %>"><%= category.catname %></option>
+											<% } else { %>
+												<option value="<%= category.categoryid %>"><%= category.catname %></option>
+											<% };
+										} else { %>
+											<option value="<%= category.categoryid %>"><%= category.catname %></option>
+										<% };
+								}); %>
+							</select>
+
+
+							<input type="submit" class="btn_search" value="Search" id="search-games-submit">
+						</div>
+					</div>
+					<!-- /search_map_wp -->
+					 
+				</div>
+				<!-- /container -->
+
+
+			</form>
+			<!-- /form -->
+
+				<div class="isotope-wrapper">
+					<% games.forEach((game) => { %>
+						<div class="row" id='game-grid'>
+							<div class="col-xl-4 col-lg-6 col-md-6 isotope-item popular">
+								<div class="box_grid">
+									<figure style="background-color: black;">
+										<a href="#" class="wish_bt"></a>
+										<a href="/gamedetails/<%= game.gameid %>" class="game-details">
+											<img src="/assets/img/uploads/<%= game.gamepic.split('/').pop() %>" 
+												class="img-fluid img-responsive"
+												alt="<%= game.description %>" width="800" height="533">
+											<div class="read_more"><span>Read more</span></div>
+										</a>
+										<small><%= game.platform %></small>
+									</figure>
+									<div class="wrapper">
+										<h3 class="text-truncate">
+											<a href="/gamedetails/<%= game.gameid %>" class="game-details"><%= game.title %></a>
+										</h3>
+										<div class="wrapper-desc">
+											<p class='game-desc'><%= game.description %></p>
+										</div>
+										<p></p>
+										<span class="price">
+											<% 	let cats = [];
+												game.categories.forEach((c) => { %>
+													<span class="badge badge-pill badge-light text-secondary">
+														<a href="/games?categories=<%= c.catid %>&" class="text-secondary"><%= c.catname %></a>
+													</span>
+											<%	});
+											%>										
+										</span>
+									</div>
+									<ul>
+										<% 
+										let isDiscount = false;
+										acproms.forEach((p) => { 
+											if (p.gameid === game.gameid) { %>
+
+												<li><i class="fab fa-gg-circle"></i>
+													<s style="display: inline-block; font-size: 10px">$<%= game.price.toFixed(2) %></s> 
+													<strong>$<%= ((1 - p.discount)*game.price).toFixed(2) %></strong>
+												</li>
+										<%	
+											isDiscount = true;
+											}; 
+										}); %>
+											
+										<%	if (!isDiscount) { %>
+												<li><i class="fab fa-gg-circle"></i> <strong>$<%= game.price.toFixed(2) %></strong></li>
+										<%	}; %>
+										<li>
+											<div class="score"><span><%= game.rating_text %>
+												<em><%= game.cnt %> Reviews</em></span><strong><%= (game.avg) ? game.avg : 0 %></strong>
+											</div>
+										</li>
+									</ul>
+								</div>
+							</div>
+						</div>
+					<% }); %>
+
+					
+
+				</div>
+				<!-- /isotope-wrapper -->
+
+
+				<nav aria-label="..." class="row justify-content-md-center">
+					<ul class="pagination pagination-sm">
+						<% if (pagination.previousPage) { %>
+							<li class="page-item">
+								<a class="page-link" href="<%= pagination.url %>page=<%= parseInt(pagination.currentPage) - 1 %>" 
+									tabindex="-1">Previous</a>
+							</li>
+						<% } else if (pagination.totalResults !== 0) { %>
+							<li class="page-item disabled">
+								<a class="page-link" href="#" tabindex="-1">Previous</a>
+							</li>
+						<% }; %>
+
+						<% for(i = 1; i <= parseInt(pagination.totalPages); i++) { 
+							
+							if (parseInt(pagination.currentPage) === i) { %>
+								<li class="page-item active"><a class="page-link" href="<%= pagination.url %>page=<%= i %>"><%= i %></a></li>
+						<% } else { %>
+								<li class="page-item"><a class="page-link" href="<%= pagination.url %>page=<%= i %>"><%= i %></a></li>
+						<% }; 
+						}; %>
+
+						<% if (pagination.nextPage) { %>
+							<li class="page-item">
+								<a class="page-link" href="<%= pagination.url %>page=<%= parseInt(pagination.currentPage) + 1 %>"
+									tabindex="-1">Next</a>
+							</li>
+						<% } else if (pagination.totalResults !== 0) { %>
+							<li class="page-item disabled">
+								<a class="page-link" href="#">Next</a>
+							</li>
+						<% }; %>
+					</ul>
+				</nav>
+				<!-- /pagination -->
+
+			</div>
+			<!-- /container -->
+
+			<div class="bg_color_1">
+				<div class="container margin_60_35">
+					<div class="row">
+						<div class="col-md-4">
+							<a href="/contact" class="boxed_list">
+								<i class="pe-7s-help2"></i>
+								<h4>Need Help? Contact us</h4>
+							</a>
+						</div>
+						<div class="col-md-4">
+							<a href="/cart" class="boxed_list">
+								<i class="pe-7s-wallet"></i>
+								<h4>Payments</h4>
+							</a>
+						</div>
+						<div class="col-md-4">
+							<a href="/" class="boxed_list">
+								<i class="pe-7s-note2"></i>
+								<h4>Cancel Policy</h4>
+							</a>
+						</div>
+					</div>
+					<!-- /row -->
+				</div>
+				<!-- /container -->
+			</div>
+			<!-- /bg_color_1 -->
+
+		</main>
+		<!--/main-->
+
+		<%- include('partials/footer'); %>
+	</div>
+	<!-- page -->
+
+
+	<div id="toTop"></div><!-- Back to top button -->
+
+
+	<!-- Masonry Filtering -->
+	<script src="../assets/js/isotope.min.js"></script>
+	<script>
+		$(window).on('load', function () {
+			var $container = $('.isotope-wrapper');
+			$container.isotope({ itemSelector: '.isotope-item', layoutMode: 'masonry' });
+		});
+
+		$('.filters_listing').on('click', 'input', 'change', function () {
+			var selector = $(this).attr('data-filter');
+			$('.isotope-wrapper').isotope({ filter: selector });
+		});
+	</script>
+
+	<!-- Choices (Multiselect)-->
+	<script src="https://res.cloudinary.com/dxfq3iotg/raw/upload/v1569006273/BBBootstrap/choices.min.js?version=7.0.0"></script>
+    <link href="https://res.cloudinary.com/dxfq3iotg/raw/upload/v1569006288/BBBootstrap/choices.min.css?version=7.0.0" rel="stylesheet" >
+	<script>
+		const multipleCancelButton = new Choices('#choices-multiple-remove-button', {
+			removeItemButton: true,
+			placeholder: true,
+			placeholderValue: 'All Categories'
+		});
+
+		$('#choices-multiple-remove-button').change(function(){
+			if ($('#choices-multiple-remove-button').val().length) {
+				$('.choices__input').attr('placeholder', '');
+
+			} else {
+				$('.choices__input').attr('placeholder', 'All Categories');
+			};
+		});
+
+		if ($('#choices-multiple-remove-button').val().length) {
+			$('.choices__input').attr('placeholder', '');
+		};
+	</script>
+
+
+	<!-- DATEPICKER  -->
+	<script>
+		$(() => {
+			'use strict';
+
+			var start = moment().subtract(29, 'days');
+    		var end = moment();
+
+			function cb(start, end) {
+				$('input[name="dates"]').val(start.format('YYYY') + ' > ' + end.format('YYYY'));
+			}
+
+			$('input[name="dates"]').daterangepicker({
+				ranges: {
+					'This Year': [moment().startOf('years'), moment().endOf('years')],
+					'Last Year': [moment().subtract(1, 'years').startOf('years'), moment().subtract(1, 'years').endOf('years')],
+					'Last 5 Years': [moment().subtract(5, 'years'), moment()],
+					'Last 10 Years': [moment().subtract(10, 'years'), moment()]
+				},
+				"opens": "right",
+				autoUpdateInput: false,
+				locale: {
+					cancelLabel: 'Clear'
+				}
+			}, cb);
+
+			$('input[name="dates"]').on('cancel.daterangepicker', function (ev, picker) {
+				$(this).val('');
+			});
+		});
+	</script>
+
+
+
+</body>
+
+</html>

@@ -1,0 +1,57 @@
+<!-- 
+
+		  		  Author:  Fleming Siow
+		   Serial Number:  4
+               	   Class:  DAAA/FT/1B/03
+    	Admission Number:  p2011828
+      	  		    Date:  7th February, 2021
+			    Filename:  footer.ejs
+
+		
+		
+		ADMIN DASHBOARD | Common footer for the admin dashboard.
+
+-->
+<footer class="sticky-footer">
+    <div class="container">
+        <div class="text-center">
+            <small>Copyright © Fleming 2021</small>
+        </div>
+    </div>
+</footer>
+
+<% 
+const gameid = page.split('/').slice(-1)[0].split('?')[0].split('#')[0];
+if (isNaN(gameid)) { %>
+    
+    <!-- WYSIWYG Editor -->
+    <script src="../assetsAdmin/js/editor/summernote-bs4.min.js"></script>
+    <link rel="stylesheet" href="../assetsAdmin/js/editor/summernote-bs4.css">
+
+    <!-- Common Script -->
+    <script src="../assetsAdmin/js/admin.js"></script>
+
+    <!-- Date Picker -->
+    <script src="../assetsAdmin/js/moment.min.js"></script>
+    <script src="../assetsAdmin/js/daterangepicker.js"></script>
+
+<% 
+} else { %>
+
+    <!-- WYSIWYG Editor -->
+    <script src="../../assetsAdmin/js/editor/summernote-bs4.min.js"></script>
+    <link rel="stylesheet" href="../../assetsAdmin/js/editor/summernote-bs4.css">
+
+    <!-- Common Script -->
+    <script src="../../assetsAdmin/js/admin.js"></script>
+    
+    <!-- Image Uploader -->
+    <script type="text/javascript" src="../../assetsAdmin/js/image-uploader.min.js"></script>
+    <link type="text/css" rel="stylesheet" href="../../assetsAdmin/css/image-uploader.min.css">
+
+    <!-- Date Picker -->
+    <script src="../../assetsAdmin/js/moment.min.js"></script>
+    <script src="../../assetsAdmin/js/daterangepicker.js"></script>
+
+<% 
+}; %>

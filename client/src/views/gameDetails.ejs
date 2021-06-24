@@ -1,0 +1,771 @@
+<!-- 
+
+		  		  Author:  Fleming Siow
+		   Serial Number:  4
+               	   Class:  DAAA/FT/1B/03
+    	Admission Number:  p2011828
+      	  		    Date:  7th February, 2021
+			    Filename:  gameDetails.ejs
+
+		
+		
+		Displays a specific game's details, including reviews. Page is identified by its gameid.
+
+-->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <%- include('partials/head'); %>
+    <title>SPGames | Game Details</title>
+
+</head>
+
+<body class="datepicker_mobile_full">
+
+    <script>
+
+        /* ===== HELPER FUNCTIONS ===== */
+
+        // formats the date for design
+        const formatDate = (timestamp) => {
+
+            // Create a date object from the timestamp
+            const date = new Date(timestamp);
+
+            // Create a list of names for the months
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+                'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+            // return a formatted date
+            return `${date.getDate()} ${months[date.getMonth()]}, ${date.getFullYear()}`;
+
+        };
+
+
+        $(document).ready(async () => {
+            
+            try {
+                const url = window.location.toString();
+                const gameid = url.split('/').slice(-1)[0].split('?')[0];
+
+                /* ===== CHECK CART IF USER HAS SAVED GAME IN CART OR BOUGHT IT ===== */
+
+                let pcExist = '', ctExist = '';
+                if (token && !isNaN(userid)) {
+                    const resFdCtByUidGid = await axios.get(`${baseUrl}/user/${userid}/game/${gameid}/cart`, config);
+                    ctExist = resFdCtByUidGid.data;
+
+                    const resFdPcByUidGid = await axios.get(`${baseUrl}/user/${userid}/game/${gameid}/purchase`, config)
+                    pcExist = resFdPcByUidGid.data;
+                };
+
+                if (pcExist) {
+                    $('#add-to-cart').text('Bought');
+                    $('#add-to-cart').addClass('disabled');
+                    $('#add-to-cart').css({ "background": "gray", "color": "white", "border": "none", "cursor": "not-allowed"})
+
+                } else if (ctExist.length) {
+                    $('#add-to-cart').text('Remove From Cart');
+                    $('#add-to-cart').css({ "background": "white", "color": "#aa252c", "border": "1px solid #aa252c" })
+
+                } else if (userid === null) {
+                    $('#add-to-cart').text('Add To Cart');
+                    $('#add-to-cart').addClass('disabled');
+                    $('#add-to-cart').css({ "background": "gray", "color": "white", "border": "none", "cursor": "not-allowed"})
+
+                } else {
+                    $('#add-to-cart').text('Add to Cart');
+                    $('#add-to-cart').css({ "background": "#aa252c", "color": "white", "border": "none" })
+                };
+
+            } catch (err) {
+
+                // check if it's an axios error
+                if (err.response) {
+                    console.log(err.response.data.Message);
+
+                } else {
+                    // log error
+                    console.log(err);
+                };
+            };
+        });
+    </script>
+
+    <div id="page" class="theia-exception">
+
+        <%- include('partials/nav'); %>
+
+        <main>
+            <section style="background: url(../assets/img/uploads/<%= game.gamepic %>) center center no-repeat; -webkit-background-size: cover;
+                            -moz-background-size: cover; -o-background-size: cover; background-size: cover;"
+                class="hero_in hotels_detail" id="game_main_img">
+
+                <div class="wrapper">
+                    <div class="container" id="game-title">
+                        <h1 class="fadeInUp"><span></span>
+                            <%= game.title %>
+                        </h1>
+                    </div>
+
+                    <span class="magnific-gallery" id="game-gallery">
+
+                        <% for (i in game.images) { if (i===0 || i==='0' ) { %>
+                            <a href="../assets/img/uploads/<%= game.images[i].imgname %>" class="btn_photos"
+                                title="<%= game.images[i].imgdesc %>" data-effect="mfp-zoom-in">View photos</a>
+
+                            <% } else { %>
+
+                                <a href="../assets/img/uploads/<%= game.images[i].imgname %>" title="<%= game.images[i].imgdesc %>"
+                                    data-effect="mfp-zoom-in"></a>
+                                <% }; }; %>
+
+                    </span>
+
+
+                </div>
+            </section>
+            <!--/hero_in-->
+
+            <div class="bg_color_1">
+                <nav class="secondary_nav sticky_horizontal">
+                    <div class="container">
+                        <ul class="clearfix">
+                            <li><a href="#description" class="active">Description</a></li>
+                            <li><a href="#reviews">Reviews</a></li>
+                            <li><a href="/"></a></li>
+                        </ul>
+                    </div>
+                </nav>
+                <div style="margin-left: 20px; margin-top: 20px">
+                    <a href="/" id="go_back"><strong><i class="arrow_carrot-left"></i> SPGames Catalogue</strong></a>
+                </div>
+                <div class="container margin_60_35">
+                    
+                    <div class="row">
+                        <div class="col-lg-8">
+                            <section id="description">
+                                <h2>Description</h2>
+                                <div id="gm-description">
+                                    <p style="max-width: 85%;">
+                                        <%= game.description %>
+                                    </p>
+                                </div>
+
+                                <hr>
+                                <h3>About The Game</h3>
+                                <div id="instagram-feed-hotel" class="clearfix"></div>
+                                <hr>
+                                <div class="room_type first">
+                                    <div class="row">
+                                        <div class="col-lg-6" id="game-categories">
+                                            <% let cats=[]; game.categories.forEach((c)=> {
+                                                cats.push(c.catname);
+                                                });
+                                                let categories = cats.join(', ');
+                                                %>
+
+                                                <span
+                                                    style="font-weight: bold; color: rgba(83, 83, 83, 0.589)">Categories</span>
+                                                <p>
+                                                    <%= categories %>
+                                                </p>
+                                        </div>
+
+                                        <div class="col-lg-3" id="game-platform">
+                                            <span
+                                                style="font-weight: bold; color: rgba(83, 83, 83, 0.589)">Platform</span>
+                                            <p>
+                                                <%= game.platform %>
+                                            </p>
+                                        </div>
+                                        <div class="col-lg-3" id="game-release-year">
+                                            <span style="font-weight: bold; color: rgba(83, 83, 83, 0.589)">Release
+                                                Year</span>
+                                            <p>
+                                                <%= game.year %>
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <!-- /row -->
+                                </div>
+                            </section>
+                            <!-- /section -->
+
+                            <section id="reviews">
+                                <h2>Reviews</h2>
+                                <div class="reviews-container">
+                                    <div class="row">
+                                        <div class="col-lg-3">
+                                            <div id="review_summary">
+                                                <% if (game.avg === null) { %>
+                                                    <strong>0</strong>
+                                                    <em>Not Reviewed</em>
+                                                    <small>Based on 0 reviews</small>
+                                                <% } else { %>
+                                                    <strong>
+                                                        <%= game.avg.toFixed(1) %>
+                                                    </strong>
+                                                    <em>
+                                                        <%= game.rating_text %>
+                                                    </em>
+                                                    <small>Based on <%= game.cnt %> reviews</small>
+                                                <% }; %>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-9">
+                                            <div class="row">
+                                                <div class="col-lg-10 col-9">
+                                                    <div class="progress" id="review-5">
+                                                        <div class="progress-bar" role="progressbar"
+                                                            style="width: <%= ratings[`5 Star (%)`] %>%"
+                                                            aria-valuenow="<%= ratings[`5 Star (%)`] %>"
+                                                            aria-valuemin="0" aria-valuemax="100">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-2 col-3"><small><strong>5 stars</strong></small>
+                                                </div>
+                                            </div>
+                                            <!-- /row -->
+                                            <div class="row">
+                                                <div class="col-lg-10 col-9">
+                                                    <div class="progress" id="review-4">
+                                                        <div class="progress-bar" role="progressbar"
+                                                            style="width: <%= ratings[`4 Star (%)`] %>%"
+                                                            aria-valuenow="<%= ratings[`4 Star (%)`] %>"
+                                                            aria-valuemin="0" aria-valuemax="100">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-2 col-3"><small><strong>4 stars</strong></small>
+                                                </div>
+                                            </div>
+                                            <!-- /row -->
+                                            <div class="row">
+                                                <div class="col-lg-10 col-9">
+                                                    <div class="progress" id="review-3">
+                                                        <div class="progress-bar" role="progressbar"
+                                                            style="width: <%= ratings[`3 Star (%)`] %>%"
+                                                            aria-valuenow="<%= ratings[`3 Star (%)`] %>"
+                                                            aria-valuemin="0" aria-valuemax="100">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-2 col-3"><small><strong>3 stars</strong></small>
+                                                </div>
+                                            </div>
+                                            <!-- /row -->
+                                            <div class="row">
+                                                <div class="col-lg-10 col-9">
+                                                    <div class="progress" id="review-2">
+                                                        <div class="progress-bar" role="progressbar"
+                                                            style="width: <%= ratings[`2 Star (%)`] %>%"
+                                                            aria-valuenow="<%= ratings[`2 Star (%)`] %>"
+                                                            aria-valuemin="0" aria-valuemax="100">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-2 col-3"><small><strong>2 stars</strong></small>
+                                                </div>
+                                            </div>
+                                            <!-- /row -->
+                                            <div class="row">
+                                                <div class="col-lg-10 col-9">
+                                                    <div class="progress" id="review-1">
+                                                        <div class="progress-bar" role="progressbar"
+                                                            style="width: <%= ratings[`1 Star (%)`] %>%"
+                                                            aria-valuenow="<%= ratings[`1 Star (%)`] %>"
+                                                            aria-valuemin="0" aria-valuemax="100">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-2 col-3"><small><strong>1 stars</strong></small>
+                                                </div>
+                                            </div>
+                                            <!-- /row -->
+                                            <div class="row">
+                                                <div class="col-lg-10 col-9">
+                                                    <div class="progress" id="review-0">
+                                                        <div class="progress-bar" role="progressbar"
+                                                            style="width: <%= ratings[`0 Star (%)`] %>%"
+                                                            aria-valuenow="<%= ratings[`0 Star (%)`] %>"
+                                                            aria-valuemin="0" aria-valuemax="100">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-2 col-3"><small><strong>0 stars</strong></small>
+                                                </div>
+                                            </div>
+                                            <!-- /row -->
+                                        </div>
+                                    </div>
+                                    <!-- /row -->
+                                </div>
+
+                                <hr>
+
+                                <div class="reviews-container" id="gm-rv-indv">
+
+                                    <% reviews.forEach((r)=> { %>
+
+                                        <div class="review-box clearfix">
+                                            <figure class="rev-thumb"><img
+                                                    src="../assets/img/user_profiles/<%= r.profile_pic_url.split('/').slice(-1)[0] %>"
+                                                    alt="<%= r.username %>"></figure>
+
+                                            <% const style = (user.username === r.username) ? 'border: 1px solid #f7dfdf' : ''; %>
+                                            <div class="rev-content" style="<%= style %>;">
+                                                <div class="rating">
+
+                                                    <% for (i=0, y=parseInt(r.rating); i < 5; i++, y--) { if (y> 0)
+                                                        { %>
+                                                        <i class="icon_star voted"></i>
+                                                        <% } else { %>
+                                                            <i class="icon_star"></i>
+                                                            <% }; }; %>
+
+                                                    <% if (user.username === r.username) { %>
+                                                        <div style="float: right;">
+                                                            <a href="#" style="color: #b56b6b;" 
+                                                                data-toggle="modal" data-target="#deleteModal">
+                                                                <i class="fa fa-times" aria-hidden="true"></i> Delete</a>
+                                                        </div>
+                                                    <% } %>
+                                                </div>
+
+                                                <div class="rev-info">
+                                                    <% const formatDate=(timestamp)=> {
+
+                                                        // Create a date object from the timestamp
+                                                        const date = new Date(timestamp);
+
+                                                        // Create a list of names for the months
+                                                        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+                                                        'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+                                                        // return a formatted date
+                                                        return `${date.getDate()} ${months[date.getMonth()]},
+                                                        ${date.getFullYear()}`;
+
+                                                        };
+                                                        %>
+
+                                                        <%= r.username %> – <%= formatDate(r.created_at) %>:
+                                                </div>
+                                                <div class="rev-text">
+                                                    <p>
+                                                        <%= r.content %>
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <% }); %>
+
+                                </div>
+                                <!-- /review-container -->
+
+                                <nav aria-label="...">
+                                    <ul class="pagination pagination-sm add_bottom_30">
+                                        <% if (pagination.previousPage) { %>
+                                            <li class="page-item">
+                                                <a class="page-link" href="/gamedetails/<%= game.gameid %>?page=<%= parseInt(pagination.currentPage) - 1 %>#reviews" 
+                                                    tabindex="-1">Previous</a>
+                                            </li>
+                                        <% } else if (pagination.totalResults !== 0 && pagination.totalResults) { %>
+                                            <li class="page-item disabled">
+                                                <a class="page-link" href="#" tabindex="-1">Previous</a>
+                                            </li>
+                                        <% }; %>
+                    
+                                        <% for(i = 1; i <= parseInt(pagination.totalPages); i++) { 
+                                            
+                                            if (parseInt(pagination.currentPage) === i) { %>
+                                                <li class="page-item active"><a class="page-link" href="/gamedetails/<%= game.gameid %>?page=<%= i %>#reviews"><%= i %></a></li>
+                                        <% } else { %>
+                                                <li class="page-item"><a class="page-link" href="/gamedetails/<%= game.gameid %>?page=<%= i %>#reviews"><%= i %></a></li>
+                                        <% }; 
+                                        }; %>
+                    
+                                        <% if (pagination.nextPage) { %>
+                                            <li class="page-item">
+                                                <a class="page-link" href="/gamedetails/<%= game.gameid %>?page=<%= parseInt(pagination.currentPage) + 1 %>#reviews"
+                                                    tabindex="-1">Next</a>
+                                            </li>
+                                        <% } else if (pagination.totalResults !== 0 && pagination.totalResults) { %>
+                                            <li class="page-item disabled">
+                                                <a class="page-link" href="#">Next</a>
+                                            </li>
+                                        <% }; %>
+                                    </ul>
+                                </nav>
+
+                                
+                            </section>
+                            <!-- /section -->
+                            <hr>
+
+                            <div class="add-review">
+                                <h5>Leave a Review</h5>
+
+                                <!-- POSTING REVIEW -->
+                                <form id="post-review" method="POST" action='/gamedetails/<%= game.gameid %>'>
+                                    <div class="row">
+                                        <div class="form-group col-md-6">
+                                            <label>Rating </label>
+                                            <div class="custom-select-form">
+                                                <select name="rating_review" id="rating_review" class="wide">
+                                                    <option value="0" selected>0 (lowest)</option>
+                                                    <option value="1">1</option>
+                                                    <option value="2">2</option>
+                                                    <option value="3">3</option>
+                                                    <option value="4">4</option>
+                                                    <option value="5">5 (highest)</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="form-group col-md-12">
+                                            <label>Your Review</label>
+                                            <textarea name="review_text" id="review_text" class="form-control"
+                                                style="height:130px;"></textarea>
+                                        </div>
+
+                                        <div id="custom-error-msg" class="col-md-10">
+
+                                        </div>
+                                
+                                        <div class="form-group col-md-12 add_top_20">
+                                            <input type="submit" value="Submit" class="btn_1" id="submit-review">
+                                        </div>
+                                    </div>
+                                </form>
+
+
+                            </div>
+                        </div>
+                        <!-- /col -->
+
+                        <aside class="col-lg-4" id="sidebar">
+                            <div class="box_detail booking">
+
+                                <!-- Rating Box -->
+                                <div class="price" id='game-buy-details'>
+                                    <% if (promotion) { %>
+                                        <span>
+                                            <div style="display: inline-block;">
+                                                <h6 class="badge bg-danger rounded-pill text-white" style="display: block; font-size: 9px">
+                                                    <%= promotion.discount*100 %>% OFF
+                                                </h6>
+                                                <s style="display: block;">$<%= game.price.toFixed(2) %></s> 
+                                            </div>
+                                            $<%= ((1-promotion.discount)*game.price).toFixed(2) %>
+                                        </span>
+                                        
+                                    <% } else { %>
+                                        <span>$<%= game.price.toFixed(2) %></span>
+
+                                    <% }; %>
+
+                                    <div class="score"><span>
+                                            <%= game.rating_text %><em>
+                                                    <%= game.cnt %> Reviews
+                                                </em>
+                                        </span>
+                                        <% if (game.avg === null) { %>
+                                            <strong>0</strong>
+                                        <% } else { %>
+                                            <strong>
+                                                <%= game.avg.toFixed(1) %>
+                                            </strong>
+                                        <% }; %>
+                                    </div>
+
+
+                                </div>
+
+                                <!-- Add to Cart -->
+                                <a href="#" style="width: 85%;" id="add-to-cart" class="btn_1">Add to Cart</a>
+                                
+                                <!-- Add to Wishlist -->
+                                <a href="#" style="width: 5%; padding-left: 10px; padding-right: 10px;" class="btn full-width outline">
+                                    <i data-toggle="tooltip" data-placement="bottom" title="Add to Wishlist" class="icon_heart"></i></a>
+                                
+                                <!-- Text -->
+                                <div class="text-center" style="margin-top: 10px;"><small>No money charged in this step</small></div>
+                            </div>
+
+                            <!-- Share Buttons -->
+                            <ul class="share-buttons">
+                                <li><a class="fb-share border-secondary text-dark" href="https://www.facebook.com">
+                                    <i class="social_facebook text-dark"></i> Share</a>
+                                </li>
+                                <li><a class="twitter-share border-secondary text-dark" href="https://www.twitter.com">
+                                    <i class="social_twitter text-dark"></i> Tweet</a>
+                                </li>
+                                <li><a class="gplus-share border-secondary text-dark" href="https://www.googleplus.com">
+                                    <i class="social_googleplus text-dark"></i> Share</a>
+                                </li>
+                            </ul>
+
+
+                        </aside>
+                    </div>
+                    <!-- /row -->
+                </div>
+                <!-- /container -->
+            </div>
+            <!-- /bg_color_1 -->
+        </main>
+        <!--/main-->
+
+        <%- include('partials/footer'); %>
+    </div>
+    <!-- page -->
+
+    <div id="toTop"></div><!-- Back to top button -->
+
+    <!-- Delete Modal -->
+    <div class="modal fade" id="deleteModal" tabindex="-1"
+        role="dialog" aria-labelledby="deleteModal" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Confirm Deletion</h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">Select "Delete" below if you wish to delete your review.
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                    <a class="btn btn-primary delete_review" href="#">Delete</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
+    <!-- POSTING REVIEW -->
+    <script>
+        $("#post-review").submit(async (event) => {
+            
+            try {
+                event.preventDefault();
+
+                const url = window.location.toString();
+                const gameid = url.split('/').slice(-1)[0].split('?')[0].split('#')[0];
+
+                /* ===== POST REVIEW TO DATABASE ===== */
+                
+                // req body
+                const reqReview = {
+                    rating: $('#rating_review').val(),
+                    content: $('#review_text').val()
+                };
+
+                const resRvId = await axios.post(`${baseUrl}/user/${userid}/game/${gameid}/review`, reqReview, config);
+                const reviewid = resRvId.data.reviewid;
+
+                const resFdRvById = await axios.get(`${baseUrl}/review/${reviewid}`);
+                const reviewPost = resFdRvById.data;
+
+                // reset inputs
+                $('#rating_review').val('0');
+                $('.nice-select .selected').removeClass('selected focus');
+                $('.nice-select li[data-value="0"]').addClass('selected focus');
+                $('.nice-select span').text('0 (lowest)')
+                $('#review_text').val('')
+
+                /* ===== UPDATE PAGE WITH THE NEW REVIEW ===== */
+
+                let htmlStarsPost = ``
+                for (i = 0, y = parseInt(reviewPost.rating); i < 5; i++, y--) {
+                    if (y > 0) {
+                        htmlStarsPost += `<i class="icon_star voted"></i>`;
+
+                    } else {
+                        htmlStarsPost += `<i class="icon_star"></i>`
+                    };
+                };
+
+                const htmlRvPost = `
+                            <div class="review-box clearfix">
+                                <figure class="rev-thumb"><img src="../assets/img/user_profiles/${reviewPost.username}.jpg" 
+                                    alt="${reviewPost.username}"></figure>
+                                <div class="rev-content">
+                                    <div class="rating">
+                                        ${htmlStarsPost}
+                                    </div>
+                                    <div class="rev-info">
+                                        ${reviewPost.username} – ${formatDate(reviewPost.created_at)}:
+                                    </div>
+                                    <div class="rev-text">
+                                        <p>
+                                            ${reviewPost.content}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>`;
+
+                await $('#gm-rv-indv').prepend(htmlRvPost);
+                window.location.reload();
+
+            } catch (err) {
+
+                if (err.response) {
+
+                    let errMsg = err.response.data.Message;
+                    if (err.response.data.Message === 'jwt malformed') {
+                        errMsg = `You need to be logged in to post a review! <a href="/login">Login Here!</a>`;
+
+                    } else if (err.response.data.Message === "You are not authorised to insert/edit on other's behalf!") {
+                        errMsg = `You are not authorised to post a review under someone else!`;
+                    };
+
+                    const htmlMsg = `
+                        <div class="alert alert-danger alert-dismissible fade show">
+                            <button type="button" class="close" data-dismiss="alert">&times;</button>
+                            <strong>Error!</strong> ${errMsg}
+                        </div>
+                    `;
+                    await $('#custom-error-msg').html(htmlMsg)
+
+                } else {
+                    // log err
+                    console.log(err);
+                };
+
+                // reset form input
+                $('#rating_review').val('0');
+                $('.nice-select .selected').removeClass('selected focus');
+                $('.nice-select li[data-value="0"]').addClass('selected focus');
+                $('.nice-select span').text('0 (lowest)')
+                $('#review_text').val('')
+            };
+        });
+
+    </script>
+
+
+    <!-- DATEPICKER  -->
+    <script>
+        $(function () {
+            $('input[name="dates"]').daterangepicker({
+                autoUpdateInput: false,
+                parentEl: '.scroll-fix',
+                minDate: new Date(),
+                opens: 'left',
+                locale: {
+                    cancelLabel: 'Clear'
+                }
+            });
+            $('input[name="dates"]').on('apply.daterangepicker', function (ev, picker) {
+                $(this).val(picker.startDate.format('MM-DD-YY') + ' > ' + picker.endDate.format('MM-DD-YY'));
+            });
+            $('input[name="dates"]').on('cancel.daterangepicker', function (ev, picker) {
+                $(this).val('');
+            });
+        });
+    </script>
+
+    <!-- ADD TO CART -->
+    <script>
+        $('#add-to-cart').click(async function (event) {
+
+            try {
+                event.preventDefault();
+                
+                const url = window.location.toString();
+                const gameid = url.split('/').slice(-1)[0].split('?')[0].split('#')[0];
+
+                if ($(this).text() === 'Bought' || userid === null) {
+                    return;
+                };
+
+                /* ===== CHECK WHETHER USER HAS ADDED GAME TO CART ===== */
+                const resFdCtByUidGid = await axios.get(`${baseUrl}/user/${userid}/game/${gameid}/cart`, config);
+                const ctExist = resFdCtByUidGid.data;
+
+                if (!ctExist.length) {
+                    await axios.post(`${baseUrl}/user/${userid}/game/${gameid}/cart`, {}, config);
+
+                    $(this).text('Remove From Cart');
+                    $(this).css({ "background": "white", "color": "#aa252c", "border": "1px solid #aa252c" })
+
+                } else {
+                    await axios.delete(`${baseUrl}/user/${userid}/game/${gameid}/cart`, config);
+
+                    $(this).text('Add to Cart');
+                    $(this).css({ "background": "#aa252c", "color": "white", "border": "none" })
+                };
+            
+            } catch (err) {
+                // log err
+                console.log(err.response.data.Message);
+            };
+        });
+    </script>
+
+    <script>
+        $(document).ready(function () {
+            $('[data-toggle="tooltip"]').tooltip();
+        });
+    </script>
+
+    <script>
+        $('#go_back').click((event) => {
+            event.preventDefault();
+            
+            const previous = '<%= previous %>'
+            if (previous) {
+                if (previous.toString().split('?')[0].split('#')[0].endsWith('/games')) {
+                    window.history.back();
+                    
+                } else {
+                    window.location.href = '/games';
+                };
+            } else {
+                window.location.href = '/games';
+            };
+        });
+    </script>
+
+    <!-- Delete Review -->
+    <script>
+        
+        $(document).on('click', '.delete_review', async function (event) {
+            
+            try {
+                event.preventDefault();
+
+                const url = window.location.toString();
+                const gameid = url.split('/').slice(-1)[0].split('?')[0].split('#')[0];
+
+                await axios.delete(`${baseUrl}/review/user/${userid}/game/${gameid}`, config);
+
+                window.location.reload();
+                
+            } catch (err) {
+              
+                // check if it's an axios error
+                if (err.response) {
+                    console.log(err.response.data.Message);
+
+                } else {
+                    // log error
+                    console.log(err);
+                };
+                
+            };
+        });
+
+    </script>
+
+
+</body>
+
+</html>

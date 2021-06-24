@@ -1,0 +1,336 @@
+<!-- 
+
+		  		  Author:  Fleming Siow
+		   Serial Number:  4
+               	   Class:  DAAA/FT/1B/03
+    	Admission Number:  p2011828
+      	  		    Date:  7th February, 2021
+			    Filename:  payment.ejs
+
+		
+		
+		This page is returned after the user checksout their cart. User must enter their payment information and
+        credentials before they are allowed to proceed to complete the transaction.
+
+-->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include('partials/head'); %>
+        <title>SPGames | Payment</title>
+
+</head>
+
+<body>
+
+    <div id="page" class="theia-exception">
+
+        <%- include('partials/nav'); %>
+
+        <script>
+
+            $(document).ready(async () => {
+    
+                try {
+    
+                    /* ===== RETRIEVE ALL THE GAMES IN THE CARTS ===== */
+                    const resFdCtsByUid = await axios.get(`${baseUrl}/cart/user/${userid}`, config);
+                    const carts = resFdCtsByUid.data;
+    
+                    /* ===== RETRIEVE GAME DETAILS FOR EACH GAME IN THE CARTS ===== */
+                    let totalPrice = 0, totalDiscount = 0;
+                    for (c of carts) {
+                        const resFdGmByGid = await axios.get(`${baseUrl}/game/id/${c.gameid}`)
+                        const game = resFdGmByGid.data;
+                        
+                        /* ==== CHECK IF ANY PROMOTION FOR GAME ===== */
+                        const resFdPmByGid = await axios.get(`${baseUrl}/promotions/game/${game.gameid}`);
+                        const promotion = resFdPmByGid.data;
+                        const discount = (promotion) ? promotion.discount : 0;
+    
+                        // Append to Receipt
+                        const gmTitleTrunc = (game.title.length > 20) ? `${game.title.slice(0, 16)}...` : game.title;
+                        const htmlCtRc = `<li class="gm_rec" data-index="${game.gameid}">${gmTitleTrunc} 
+                                                <span class="gm-price">+ $${game.price.toFixed(2)}</span></li>`;
+                        await $('#cart_summary').append(htmlCtRc);
+    
+    
+                        totalPrice += parseFloat(game.price);
+                        totalDiscount += game.price * discount;
+                    };
+    
+                    /* ===== UPDATE RECEIPT AT THE SIDE ===== */
+    
+                    // Tax Invoice
+                    const invoice = totalPrice * 7/100
+                    const htmlInvoice = `<li>GST (7%) <span id="gst_paid">+ $${invoice.toFixed(2)}</span></li>`;
+                    $('#cart_invoice').append(htmlInvoice);
+    
+                    // Discount (Promotions)
+                    const htmlDisc = `<li>Discount <span id="discount_given">– $${totalDiscount.toFixed(2)}</span></li>`;
+                    $('#cart_invoice').append(htmlDisc);
+    
+                    // Total Amount Payable
+                    const htmlTPrice = `Total <span id="tprice" class="float-right">$${(totalPrice + invoice - totalDiscount).toFixed(2)}</span>`;
+                    $('#total_cart').append(htmlTPrice);
+    
+    
+                } catch (err) {
+                    console.log(err);
+                };
+            });
+    
+        </script>
+
+            <main>
+                <div class="hero_in cart_section">
+                    <div class="wrapper">
+                        <div class="container">
+                            <div class="bs-wizard clearfix">
+                                <div class="bs-wizard-step">
+                                    <div class="text-center bs-wizard-stepnum">Your cart</div>
+                                    <div class="progress">
+                                        <div class="progress-bar"></div>
+                                    </div>
+                                    <a href="/cart" class="bs-wizard-dot"></a>
+                                </div>
+
+                                <div class="bs-wizard-step active">
+                                    <div class="text-center bs-wizard-stepnum">Payment</div>
+                                    <div class="progress">
+                                        <div class="progress-bar"></div>
+                                    </div>
+                                    <a href="/payment" class="bs-wizard-dot"></a>
+                                </div>
+
+                                <div class="bs-wizard-step disabled">
+                                    <div class="text-center bs-wizard-stepnum">Finish!</div>
+                                    <div class="progress">
+                                        <div class="progress-bar"></div>
+                                    </div>
+                                    <a href="/" class="bs-wizard-dot"></a>
+                                </div>
+                            </div>
+                            <!-- End bs-wizard -->
+                        </div>
+                    </div>
+                </div>
+                <!--/hero_in-->
+
+                <div class="bg_color_1">
+                    <div class="container margin_60_35">
+                        <div class="row">
+                            <div class="col-lg-8">
+                                <div class="box_cart">
+
+                                    <!-- Payment Information -->
+                                    <div class="form_title">
+                                        <h3><strong>1</strong>Payment Information</h3>
+                                        <p>
+                                            Your credit card information will not be saved by us and will be solely used
+                                            for billing purposes
+                                        </p>
+                                    </div>
+                                    <div class="step">
+                                        <div class="form-group">
+                                            <label>Name on card</label>
+                                            <input type="text" class="form-control" id="cc_name"
+                                                name="name_card_bookign">
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-6 col-sm-12">
+                                                <div class="form-group">
+                                                    <label>Card number</label>
+                                                    <input type="text" id="cc_num" name="card_number"
+                                                        class="form-control">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 col-sm-12">
+                                                <img src="../assets/img/cards_all.svg" alt="Cards"
+                                                    class="cards-payment">
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+
+                                            <div class="col-md-6">
+                                                <label>Expiration date</label>
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <input type="text" id="exp_month" name="expire_month"
+                                                                class="form-control" placeholder="MM">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <input type="text" id="exp_year" name="expire_year"
+                                                                class="form-control" placeholder="Year">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label>Security code</label>
+                                                    <div class="row">
+                                                        <div class="col-4">
+                                                            <div class="form-group">
+                                                                <input type="text" id="ccv" name="ccv"
+                                                                    class="form-control" placeholder="CCV">
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-8">
+                                                            <img src="../assets/img/icon_ccv.gif" width="50"
+                                                                height="29" alt="ccv"><small>Last 3 digits</small>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div id="custom-msg"></div>
+                                        <!--End row -->
+
+                                        <hr>
+
+                                        <h4>Or checkout with Paypal</h4>
+                                        <p>
+                                            You will be directed to PayPal to authorize your payment method,
+                                            then you will be returned to SPGames to complete this purchase.
+                                        </p>
+                                        <p>
+                                            <a href="#"><img src="../assets/img/paypal_bt.png" alt="Image"></a>
+                                        </p>
+                                    </div>
+                                    <hr>
+                                    <!--End Payment Information -->
+
+                                    <!--End step -->
+                                    <div id="policy">
+                                        <h5>Cancellation policy</h5>
+                                        <p class="nomargin" style="max-width: 95%;">
+                                            You can cancel a digital content purchase within 14 days from the date of transaction, provided 
+                                            that you have not started downloading or streaming it. <a href="#">Read More Here.</a></p>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- /col -->
+
+                            <!-- Receipt Sidebar -->
+							<aside class="col-lg-4" id="sidebar">
+								<div class="box_detail">
+									<div id="total_cart">
+										
+									</div>
+									<ul class="cart_details" id="cart_summary">
+									</ul>
+									<ul class="cart_details" id="cart_invoice">
+									</ul>
+									<a href="#" id="purchase-transaction" class="btn_1 full-width purchase">Purchase</a>
+									<div class="text-center"><small>Upon purchasing, your money will be transferred</small></div>
+								</div>
+							</aside>
+
+                            
+                        </div>
+                        <!-- /row -->
+                    </div>
+                    <!-- /container -->
+                </div>
+                <!-- /bg_color_1 -->
+            </main>
+            <!--/main-->
+
+            <%- include('partials/footer'); %>
+    </div>
+    <!-- page -->
+
+
+
+    <div id="toTop"></div><!-- Back to top button -->
+
+    <!-- TRANSACTION PURCHASE -->
+    <script>
+
+        $('#purchase-transaction').click(async (event) => {
+
+            try {
+                event.preventDefault();
+                
+                /* ===== RETRIEVE ALL THE GAMES IN THE CARTS ===== */
+				const resFdCtsByUid = await axios.get(`${baseUrl}/cart/user/${userid}`, config);
+				const carts = resFdCtsByUid.data;
+                const gameids = carts.map(c => parseInt(c.gameid));
+
+
+                /* ===== STORE TRANSACTION DETAILS ===== */
+                let subtotal = 0;
+                for (g of $('.gm-price')) {
+                    subtotal += parseFloat($(g).text().split('$')[1])
+                };
+
+                // req body
+                const reqReview = {
+                    subtotal: subtotal,
+                    gst_paid: $('#gst_paid').text().split('$')[1],
+                    discount: $('#discount_given').text().split('$')[1],
+                    total: $('#tprice').text().substring(1),
+                    cc_name: $('#cc_name').val(),
+                    cc_num: $('#cc_num').val(),
+                    ccv: parseInt($('#ccv').val()),
+                    exp_month: parseInt($('#exp_month').val()),
+                    exp_year: parseInt($('#exp_year').val())
+                };
+
+                const resTsId = await axios.post(`${baseUrl}/user/${userid}/transaction`, reqReview, config)
+                const tid = resTsId.data.transactionid;
+
+
+                /* ===== STORE PURCHASE FOR EACH GAME ===== */
+                let totalPrice = 0, discount = 0;
+				for (gid of gameids) {
+					await axios.post(`${baseUrl}/user/${userid}/game/${gid}/trans/${tid}/purchase`, {}, config);
+                };
+                
+
+                /* ===== REMOVE ALL CARTS FOR USER ===== */
+                await axios.delete(`${baseUrl}/cart/user/${userid}`, config);
+
+                window.location.href = '/payment-success';
+
+                
+            } catch (err) {
+
+                let errorMsg;
+
+                // check if it's axios err
+                if (err.response) {
+                    errorMsg = `${err.response.data.Message}`;
+                    console.log(err.response.data.Message);
+
+                } else {
+                    console.log(err);
+                };
+
+
+                const htmlErr = `
+						<div class="alert alert-danger alert-dismissible fade show">
+							<button type="button" class="close" data-dismiss="alert">&times;</button>
+							<strong>Error!</strong> ${errorMsg}
+						</div>
+                    `;
+                    
+                $('#custom-msg').html(htmlErr)
+            };
+
+        });
+
+
+    </script>
+
+</body>
+
+</html>

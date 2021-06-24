@@ -1,0 +1,431 @@
+<!-- 
+
+		  		  Author:  Fleming Siow
+		   Serial Number:  4
+               	   Class:  DAAA/FT/1B/03
+    	Admission Number:  p2011828
+      	  		    Date:  7th February, 2021
+			    Filename:  index.ejs
+
+		
+		
+		Home Page for SPGames. 
+
+-->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	
+    <%- include('partials/head'); %>
+    <title>SPGames | Home</title>
+
+</head>
+
+<body>
+
+	<div id="page">
+
+		<%- include('partials/nav'); %>
+
+		<main>
+			<section class="slider">
+
+				<div id="slider" class="flexslider">
+					<ul class="slides">
+						<% topGms.forEach((game) => { %>
+							<li>
+								<img src="/assets/img/uploads/<%= game.gamepic.split('/').pop() %>" alt="<%= game.description %>">
+								<div class="meta">
+									<h3><%= game.title %></h3>
+									<div class="info">
+										<p><strong>$<%= game.price.toFixed(2) %></strong></p>
+									</div>
+									<a href="/gamedetails/<%= game.gameid %>" class="btn_1">Read more</a>
+								</div>
+							</li>
+						<% }); %>
+
+					</ul>
+					<div id="icon_drag_mobile"></div>
+				</div>
+
+				<div id="carousel_slider_wp">
+					<div id="carousel_slider" class="flexslider">
+						<ul class="slides">
+							<% topGms.forEach((game) => { %>
+								<li style="height: 150px; overflow: hidden;">
+									<img src="/assets/img/uploads/<%= game.gamepic.split('/').pop() %>" alt="<%= game.description %>">
+									<div class="caption">
+										<h3 class="text-truncate"><%= game.title %> <span><%= game.platform %></span></h3>
+										<small><%= game.cnt %> Reviews – <%= game.avg %> Stars</small>
+									</div>
+								</li>
+							<% }); %>	
+						</ul>
+					</div>
+				</div>
+			</section>
+
+            <!-- FORM — Search Games -->
+			<form class="search_container" method="POST" action='/games'>
+				<div class="container">
+					<div class="col-lg-12">
+						<div class="row no-gutters custom-search-input-2 inner" id="search-games">
+
+                            <!-- Search by Name -->
+							<div class="col-lg-4">
+								<div class="form-group">
+									<input class="form-control" type="text" id="searchGame"
+										placeholder="Search for a game..." name="searchGame">
+									<i class="icon_search"></i>
+								</div>
+                            </div>
+                            
+                            <!-- Search by Max Price -->
+							<div class="col-lg-2">
+								<div class="form-group">
+									<input class="form-control" type="number" min="0.00" step="0.01" id="max-price"
+										placeholder="Price" name="price">
+									<i class="fas fa-comment-dollar"></i>
+								</div>
+                            </div>
+                            
+                            <!-- Search by Year Range -->
+							<div class="col-lg-2">
+								<div class="form-group">
+									<input class="form-control" type="text" name="dates" id="date" placeholder="When.." autocomplete="off">
+									<i class="icon_calendar"></i>
+								</div>
+                            </div>
+                            
+                            <!-- Search by Platform -->
+							<div class="col-lg-2">
+								<select class="wide" id="platform" name="platform">
+									<option>All Platforms</option>
+									<% platforms.forEach((p) => { %>
+										<option><%= p.platform %></option>
+									<% }); %>
+								</select>
+                            </div>
+                            
+                            <!-- Search Button -->
+							<div class="col-lg-2">
+								<input type="submit" class="btn_search" value="Search" id="search-games-submit">
+                            </div>
+                            
+						</div>
+					</div>
+				</div>
+			</form>
+			<!-- /form -->
+
+
+			<div class="container container-custom margin_60_0">
+				<div class="main_title_2">
+					<span><em></em></span>
+					<h2>New Releases</h2>
+					<p>Providing you the latest trending games.</p>
+				</div>
+				<div id="reccomended" class="owl-carousel owl-theme">
+
+					<% games.forEach((game) => { %>
+						<div class="item">
+							<div class="box_grid">
+								<figure style="background-color: black;">
+									<a href="/wishlist" class="wish_bt"></a>
+									<a href="/gamedetails/<%= game.gameid %>">
+										<img src="/assets/img/uploads/<%= game.gamepic.split('/').pop() %>" 
+											class="img-fluid" alt="<%= game.description %>" width="800" height="533">
+										<div class="read_more"><span>Read more</span></div>
+									</a>
+									<small><%= game.platform %></small>
+								</figure>
+								<div class="wrapper">
+									<%
+										if (game.title.length > 20) {
+											game.title = game.title.substring(0, 20) + '...'; 
+										};
+									%>
+									<h3><a href="/gamedetails/<%= game.gameid %>"><%= game.title %></a></h3>
+									<div class="wrapper-desc">
+										<p class='game-desc'><%= game.description %></p>
+									</div><br/>
+									<span class="price">
+										<% 	let cats = [];
+											game.categories.forEach((c) => { %>
+												<span class="badge badge-pill badge-light text-secondary">
+													<a href="/games?categories=<%= c.catid %>&" class="text-secondary"><%= c.catname %></a>
+												</span>
+										<%	});
+										%>								
+									</span>
+								</div>
+								<ul>
+									<% 
+									let isDiscount = false;
+									acproms.forEach((p) => { 
+										if (p.gameid === game.gameid) { %>
+
+											<li><i class="fab fa-gg-circle"></i>
+												<s style="display: inline-block; font-size: 10px">$<%= game.price.toFixed(2) %></s> 
+												<strong>$<%= ((1 - p.discount)*game.price).toFixed(2) %></strong>
+											</li>
+									<%	
+										isDiscount = true;
+										}; 
+									}); %>
+										
+									<%	if (!isDiscount) { %>
+											<li><i class="fab fa-gg-circle"></i> <strong>$<%= game.price.toFixed(2) %></strong></li>
+									<%	}; %>
+
+									<li>
+										<div class="score"><span><%= game.rating_text %>
+											<em><%= game.cnt %> Reviews</em></span><strong><%= (game.avg) ? game.avg : 0 %></strong>
+										</div>
+									</li>
+								</ul>
+
+							</div>
+						</div>
+						<!-- /item -->
+					<% }); %>
+				</div>
+				<!-- /carousel -->
+				<p class="btn_home_align"><a href="/games" class="btn_1 rounded">View all Games</a></p>
+				<hr class="large">
+			</div>
+			<!-- /container -->
+
+			<div class="container container-custom margin_30_95">
+				<section class="add_bottom_45">
+					<div class="main_title_3">
+						<span><em></em></span>
+						<h2>Promotions</h2>
+						<p>Bringing you the best prices for your entertainment.</p>
+					</div>
+					<div class="row">
+
+						<% promotions.forEach((promotion) => { %>
+							<div class="col-xl-3 col-lg-6 col-md-6">
+								<a href="/gamedetails/<%= promotion.gameid %>" class="grid_item">
+									<figure style="height:200px; overflow: hidden;">
+										<div class="score"><strong><%= promotion.discount * 100 %>% OFF</strong></div>
+										<img src="/assets/img/uploads/<%= promotion.prompic.split('/').pop() %>" 
+											class="img-fluid" alt="<%= promotion.promname %>">
+										<div class="info">
+											<span><%= promotion.avalFrom %> – <%= promotion.avalTo %></span>
+											<h3><%= promotion.promname %></h3>
+										</div>
+									</figure>
+								</a>
+							</div>
+						<% }); %>
+
+					</div>
+					<!-- /row -->
+					<a href="/promotions"><strong>View all <i class="arrow_carrot-right"></i></strong></a>
+				</section>
+				<!-- /section -->
+
+				<div class="banner mb-0">
+					<div class="wrapper d-flex align-items-center opacity-mask" data-opacity-mask="rgba(0, 0, 0, 0.3)">
+						<div>
+							<small>SPGames Store Catalog</small>
+							<h3>Browse</h3>
+							<p>Explore our catalog for <br/>your next favorite game!</p>
+							<a href="/games" class="btn_1">Browse All</a>
+						</div>
+					</div>
+					<!-- /wrapper -->
+				</div>
+				<!-- /banner -->
+
+			</div>
+			<!-- /container -->
+
+			<div class="bg_color_1">
+				<div class="container margin_80_55">
+					<div class="main_title_2">
+						<span><em></em></span>
+						<h3>News and Events</h3>
+						<p>Catch up with the latest updates!</p>
+					</div>
+					<div class="row">
+
+						<div class="col-lg-6">
+							<a class="box_news" href="#0">
+								<figure style="background: black;"><img src="/../assets/img/news_home_1.jpg" alt="">
+									<figcaption><strong>8</strong>Feb</figcaption>
+								</figure>
+								<ul>
+									<li>Fleming Siow</li>
+									<li>08/02/2021</li>
+								</ul>
+								<h4>New look!</h4>
+								<div class="wrapper-desc">
+									<p>SPGames is committed to delivering all customers with the
+										best gaming experience. Thus, we've decided to do a revamp of our site.....
+									</p>
+								</div>
+							</a>
+						</div>
+						<!-- /box_news -->
+
+
+						<div class="col-lg-6">
+							<a class="box_news" href="#0">
+								<figure style="background: black;"><img src="/../assets/img/membership.jpg" alt="SPX Membership">
+									<figcaption><strong>20</strong>Dec</figcaption>
+								</figure>
+								<ul>
+									<li>Shoyo Fuyuki</li>
+									<li>20/12/2020</li>
+								</ul>
+								<h4>SPx Membership</h4>
+								<div class="wrapper-desc">
+									<p>Our subscription options let Partners and Affiliates reward and interact with their most passionate gaming fans. 
+										Among the benefits for subscribers are: access to early releases and special discounts across all games...
+									</p>
+								</div>
+							</a>
+						</div>
+						<!-- /box_news -->
+
+
+						<div class="col-lg-6">
+							<a class="box_news" href="#0">
+								<figure style="background: black;"><img src="/../assets/img/gamelauncher.jpg" alt="">
+									<figcaption><strong>30</strong>Aug</figcaption>
+								</figure>
+								<ul>
+									<li>Yugi Amane</li>
+									<li>30/08/2020</li>
+								</ul>
+								<h4>SPGames Launcher</h4>
+								<div class="wrapper-desc">
+									<p>What is the SP Games Launcher? SPGames Launcher is a digital distribution platform for video games 
+										and software developed by SPGames. The SPGames Launcher is available for free download from the 
+										SPGames website. The launcher is supported on Windows and macOS computers.
+									</p>
+								</div>
+							</a>
+						</div>
+						<!-- /box_news -->
+
+
+						<div class="col-lg-6">
+							<a class="box_news" href="#0">
+								<figure style="background: black;"><img src="/../assets/img/rocket_league.png" alt="rocket_league">
+									<figcaption><strong>15</strong>Jun</figcaption>
+								</figure>
+								<ul>
+									<li>Fleming Siow</li>
+									<li>15/06/2020</li>
+								</ul>
+								<h4>Suit Up For RL</h4>
+								<div class="wrapper-desc">
+									<p>The NFL and Rocket League are getting ready for the big game next week with the NFL Super 
+										Bowl LV Celebration! It's a Rocket League event that's bringing the brand new game mode, 
+										Gridiron, Event Challenges, and the return of the NFL Fan Pack. It all starts July 2 
+										and will be live until July 8.
+									</p>
+								</div>
+							</a>
+						</div>
+						<!-- /box_news -->
+						
+					</div>
+					<!-- /row -->
+					<p class="btn_home_align"><a href="/news" class="btn_1 rounded">View all News</a></p>
+				</div>
+				<!-- /container -->
+			</div>
+			<!-- /bg_color_1 -->
+
+			<div class="call_section">
+				<div class="container clearfix">
+					<div class="col-lg-5 col-md-6 float-right wow" data-wow-offset="250">
+						<div class="block-reveal">
+							<div class="block-vertical"></div>
+							<div class="box_1">
+								<h3>Enjoy a GREAT gaming experience with us</h3>
+								<p>Delivering games to you across the internet.....</p>
+								<a href="#" class="btn_1 rounded">Read more</a>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!--/call_section-->
+		</main>
+		<!-- /main -->
+
+		<%- include('partials/footer'); %>
+	</div>
+	<!-- page -->
+
+	<div id="toTop"></div><!-- Back to top button -->
+
+	<!-- FlexSlider -->
+	<script>
+		$(window).on('load', function () {
+			'use strict';
+			$('#carousel_slider').flexslider({
+				animation: "slide",
+				controlNav: false,
+				animationLoop: false,
+				slideshow: false,
+				itemWidth: 280,
+				itemMargin: 25,
+				asNavFor: '#slider'
+			});
+			$('#slider').flexslider({
+				animation: "fade",
+				controlNav: false,
+				animationLoop: false,
+				slideshow: false,
+				sync: "#carousel_slider",
+				start: function (slider) {
+					$('body').removeClass('loading');
+				}
+			});
+		});
+	</script>
+
+	<!-- DATEPICKER  -->
+	<script>
+		$(() => {
+			'use strict';
+
+			var start = moment().subtract(29, 'days');
+    		var end = moment();
+
+			function cb(start, end) {
+				$('input[name="dates"]').val(start.format('YYYY') + ' > ' + end.format('YYYY'));
+			}
+
+			$('input[name="dates"]').daterangepicker({
+				ranges: {
+					'This Year': [moment().startOf('years'), moment().endOf('years')],
+					'Last Year': [moment().subtract(1, 'years').startOf('years'), moment().subtract(1, 'years').endOf('years')],
+					'Last 5 Years': [moment().subtract(5, 'years'), moment()],
+					'Last 10 Years': [moment().subtract(10, 'years'), moment()]
+				},
+				"opens": "left",
+				autoUpdateInput: false,
+				locale: {
+					cancelLabel: 'Clear'
+				}
+			}, cb);
+
+			$('input[name="dates"]').on('cancel.daterangepicker', function (ev, picker) {
+				$(this).val('');
+			});
+		});
+	</script>
+
+</body>
+
+</html>

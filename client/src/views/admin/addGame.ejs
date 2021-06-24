@@ -1,0 +1,353 @@
+<!-- 
+
+		  		  Author:  Fleming Siow
+		   Serial Number:  4
+               	   Class:  DAAA/FT/1B/03
+    	Admission Number:  p2011828
+      	  		    Date:  7th February, 2021
+			    Filename:  addProm.ejs
+
+		
+		
+		ADMIN DASHBOARD | Lets admin add a promotion listing
+-->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+	<%- include('partials/head'); %>
+	<title>SPGames | Admin Dashboard | Add Game</title>
+
+</head>
+
+<body class="fixed-nav sticky-footer" id="page-top">
+
+	<%- include('partials/nav'); %>
+
+	<script>
+		const getInfo = async () => {
+
+			/* ===== RETRIEVE ALL CATEGORIES IN THE DB ===== */
+			const resGetCat = await axios.get(`${baseUrl}/category`);
+			const categories = resGetCat.data;
+
+			let htmlListCat = ``;
+			for (cat of categories) {
+				htmlListCat += `<option data-index=${cat.categoryid}>${cat.catname}</option>`;
+			};
+
+			await $('#choices-multiple-remove-button').append(htmlListCat);
+
+
+			const multipleCancelButton = new Choices('#choices-multiple-remove-button', {
+				removeItemButton: true,
+				placeholder: true,
+				placeholderValue: 'Select category'
+			});
+
+
+			/* ===== RETRIEVE ALL PLATFORMS IN THE DB ===== */
+			const resGetPfs = await axios.get(`${baseUrl}/platforms`);
+			const platforms = resGetPfs.data;
+
+			let htmlListPfs = ``;
+			for (platform of platforms) {
+				htmlListPfs += `<option>${platform.platform}</option>`;
+			};
+
+			await $('#game-platforms').append(htmlListPfs);
+		};
+
+		getInfo();
+
+	</script>
+
+		<form class="content-wrapper" id="post-new-game">
+			<div class="container-fluid">
+
+
+				<!-- Breadcrumbs-->
+				<ol class="breadcrumb">
+					<li class="breadcrumb-item">
+						<a href="/dashboard">Dashboard</a>
+					</li>
+					<li class="breadcrumb-item active">Add Game</li>
+				</ol>
+
+				<!-- Basic Details -->
+				<div class="box_general padding_bottom">
+					<div class="header_box version_2">
+						<h2><i class="fa fa-file"></i>Basic Info</h2>
+					</div>
+
+					<div class="row">
+						<div class="col-md-6">
+							<div class="form-group">
+								<label>Game Title</label>
+								<input type="text" id="game-title" class="form-control"
+									placeholder="Enter the name of the game...">
+							</div>
+						</div>
+
+						<div class="col-md-6">
+							<div class="form-group">
+								<label>Category</label>
+								<div>
+									<select id="choices-multiple-remove-button" multiple>
+
+									</select>
+								</div>
+							</div>
+						</div>
+					</div>
+
+
+					<div class="row">
+						<div class="col-md-6">
+							<div class="form-group">
+								<label>Platform</label>
+								<div class="styled-select">
+									<input list="game-platforms" name="game_platform" />
+									<datalist id="game-platforms">
+									</datalist>
+								</div>
+							</div>
+						</div>
+						<div class="col-md-6">
+							<div class="form-group">
+								<div class="form-group">
+									<label>Year of Release</label>
+									<input class="form-control" type="number" min="1900" max="3000" step="1"
+										id="year-of-release" placeholder="Year of Release" name="yearofrelease"
+										onkeydown="if(event.key==='.'){event.preventDefault();}">
+								</div>
+							</div>
+						</div>
+					</div>
+
+
+					<div class="row">
+						<div class="col-md-12">
+							<div class="form-group">
+								<label>Description</label>
+								<div class="editor" id="game-desc"></div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+
+				<!-- IMAGE BOX -->
+				<div class="box_general padding_bottom">
+					<div class="header_box version_2">
+						<h2><i class="fas fa-images"></i>Images</h2>
+					</div>
+					<div class="row">
+						<div class="col-md-12 form-group">
+							<label>Upload Game Display Image</label>
+							<div class="input-group mb-3 px-2 py-2 rounded-pill bg-light shadow-sm">
+								<input id="upload" type="file" onchange="readURL(this);" class="form-control border-0">
+								<label id="upload-label" for="upload" class="font-weight-light text-muted">Choose
+									file</label>
+								<div class="input-group-append">
+									<label for="upload" class="btn btn-light m-0 rounded-pill px-4"> <i
+											class="fa fa-cloud-upload mr-2 text-muted"></i><small
+											class="text-uppercase font-weight-bold text-muted">Choose
+											file</small></label>
+								</div>
+							</div>
+						</div>
+						<div class="col-md-6">
+							<div class="image-area mt-4"><img id="imageResult" src="#" alt=""
+									class="img-fluid rounded shadow-sm mx-auto d-block"></div>
+						</div>
+					</div>
+				</div>
+
+				<!-- Pricing Details -->
+				<div class="box_general padding_bottom">
+					<div class="header_box version_2">
+						<h2><i class="fa fa-dollar"></i>Pricing</h2>
+					</div>
+					<div class="row">
+						<div class="col-md-12">
+							<table id="pricing-list-container" style="width:100%;">
+								<tr class="pricing-list-item">
+									<td>
+										<div class="row">
+											<div class="col-md-3">
+												<div class="form-group">
+													<input class="form-control" type="number" min="0.00" step="0.01"
+														id="game-price" placeholder="Price" name="price">
+												</div>
+											</div>
+										</div>
+									</td>
+								</tr>
+							</table>
+						</div>
+					</div>
+				</div>
+
+				<!-- Custom Message -->
+				<div id="custom_msg">
+                </div>
+
+				<!-- Submit -->
+				<p><input type="submit" value="Create" class="btn_1 medium" id="post-game"></p>
+
+			</div>
+		</form>
+
+		<%- include('partials/footer'); %>
+		<!-- /.container-wrapper-->
+
+
+		<!-- Scroll to Top Button-->
+		<a class="scroll-to-top rounded" href="#page-top">
+			<i class="fa fa-angle-up"></i>
+		</a>
+		
+
+		<script>
+
+			/*  ==========================================
+				SHOW UPLOADED IMAGE
+			* ========================================== */
+			function readURL(input) {
+				if (input.files && input.files[0]) {
+					var reader = new FileReader();
+
+					reader.onload = function (e) {
+						$('#imageResult')
+							.attr('src', e.target.result);
+					};
+					reader.readAsDataURL(input.files[0]);
+				}
+			}
+
+			$(function () {
+				$('#upload').on('change', function () {
+					readURL(input);
+				});
+			});
+
+			/*  ==========================================
+				SHOW UPLOADED IMAGE NAME
+			* ========================================== */
+			var input = document.getElementById('upload');
+			var infoArea = document.getElementById('upload-label');
+
+			input.addEventListener('change', showFileName);
+			function showFileName(event) {
+				var input = event.srcElement;
+				var fileName = input.files[0].name;
+				infoArea.textContent = 'File name: ' + fileName;
+			}
+
+		</script>
+
+
+		<!-- ===== POSTING GAME ===== -->
+		<script>
+			$("#post-new-game").submit(async (event) => {
+
+				try {
+					event.preventDefault();
+
+					/* ===== RETRIEVE CATEGORY IDS THAT ADMIN SELECTED ===== */
+					const catnames = [...$("#choices-multiple-remove-button").val().toString().split(',')];
+					const catids = [];
+					for (cat of catnames) {
+						const resCat = await axios.get(`${baseUrl}/category/name/${cat}`);
+						catids.push(resCat.data.catid);
+					};
+
+
+					/* ==== FRONT END FORM VALIDATION ===== */
+					if (!$('#game-title').val()) { throw new Error('Game title must be filled.');};
+					if (!$('#game-price').val()) { throw new Error('Game price must be filled.');};
+					if (!$("[name='game_platform']").val()) { throw new Error('Platform must be filled.');};
+					if (!$('#year-of-release').val()) { throw new Error('Game year of release must be filled.');};
+					if (!$('#upload').prop('files')[0]) { throw new Error('You need to upload an image.') }
+
+
+					/* ===== CREATE GAME LISTING ===== */
+
+					const reqGame = {
+						title: $("#game-title").val(),
+						description: $($('#game-desc').summernote('code')).text(),
+						price: $("#game-price").val(),
+						platform: $("[name='game_platform']").val(),
+						categoryids: catids,
+						year: $("#year-of-release").val(),
+						img: $('#upload').prop('files')[0]
+					};
+
+					const formData = new FormData()
+					Object.keys(reqGame).forEach((key) => {
+						formData.append(key, reqGame[key]);
+					});
+
+					const resGmId = await axios.post(`${baseUrl}/game`, formData, config);
+					const gameid = resGmId.data.gameid;
+
+					// store game title to storage so we know the game has been successfully created
+					await localStorage.setItem('createdGame', $("#game-title").val());
+
+					window.location.href = "/dashboard/gamelist";
+
+
+				} catch (err) {
+
+					let errMsg = err.toString().slice(7);
+
+					// check if it's an axios error
+					if (err.response) {
+						
+						errMsg = err.response.data.Message;
+
+						if (errMsg === 'No Category found with the id name.') { errMsg = 'Category must be filled up. '}
+
+						// log axios error
+						console.log(err.response.data.Message);
+
+					} else {
+
+						// log error
+						console.log(err);
+					};
+
+					const htmlMsg = `
+							<div class="alert alert-danger alert-dismissible fade show">
+								<button type="button" class="close" data-dismiss="alert">&times;</button>
+								<strong>Error!</strong> ${errMsg}
+							</div>
+						`;
+					await $('#custom_msg').html(htmlMsg)
+				};
+			});
+
+		</script>
+
+		<!-- Summernote -->
+		<script>
+			$('.editor').summernote({
+				fontSizes: ['10', '14'],
+				toolbar: [
+				// [groupName, [list of button]]
+				['style', ['bold', 'italic', 'underline', 'clear']],
+				['font', ['strikethrough']],
+				['fontsize', ['fontsize']],
+				['para', ['ul', 'ol', 'paragraph']]
+				],
+				placeholder: 'Write here your description....',
+				tabsize: 2,
+				height: 200
+			});
+		</script>
+
+</body>
+
+</html>

@@ -1,0 +1,248 @@
+<!-- 
+
+		  		  Author:  Fleming Siow
+		   Serial Number:  4
+               	   Class:  DAAA/FT/1B/03
+    	Admission Number:  p2011828
+      	  		    Date:  7th February, 2021
+			    Filename:  catList.ejs
+
+		
+		
+		ADMIN DASHBOARD | Displays all category listings
+-->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include('partials/head'); %>
+    <title>SPGames | Admin Dashboard | Category Listing</title>
+</head>
+
+<body class="fixed-nav sticky-footer" id="page-top">
+    
+    <%- include('partials/nav'); %>
+
+    <div class="content-wrapper">
+        <div class="container-fluid">
+
+
+            <!-- Breadcrumbs-->
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">
+                    <a href="/dashboard">Dashboard</a>
+                </li>
+                <li class="breadcrumb-item active">Category List</li>
+            </ol>
+
+            <div id="custom_msg">
+            </div>
+
+            <!-- Custom Message -->
+            <script>
+                const customMsg = async () => {
+
+                    try {
+
+                        const createdCat = localStorage.getItem('createdCat');
+                        const updatedCat = localStorage.getItem('updatedCat');
+                        const deletedCat = localStorage.getItem('deletedCat');
+
+                        if (createdCat) {
+
+                            localStorage.removeItem('createdCat');
+
+                            const htmlCM = `
+                                <div class="alert alert-success alert-dismissible w-50">
+                                    <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                                    <strong>Success!</strong> ${createdCat} category listing was added.
+                                </div>
+                            `;
+                            $("#custom_msg").append(htmlCM);
+                        
+                        } else if (updatedCat) {
+
+                            localStorage.removeItem('updatedCat');
+
+                            const htmlCM = `
+                                <div class="alert alert-success alert-dismissible w-50">
+                                    <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                                    <strong>Success!</strong> ${updatedCat} category listing was updated.
+                                </div>
+                            `;
+                            await $('#custom_msg').append(htmlCM);
+
+                            } else if (deletedCat) {
+
+                            localStorage.removeItem('deletedCat');
+
+                            const htmlCM = `
+                                <div class="alert alert-success alert-dismissible w-50">
+                                    <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                                    <strong>Success!</strong> ${deletedCat} category listing was deleted.
+                                </div>
+                            `;
+                            await $('#custom_msg').append(htmlCM);
+
+                        };
+
+                    } catch (err) {
+                        console.log(err);
+                    };
+                };
+
+                customMsg();
+
+            </script>
+
+
+            <!-- Example DataTables Card-->
+            <div class="card mb-3">
+                <div class="card-header">
+                    <i class="fa fa-table"></i> Categories
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+
+                            <!-- Headers -->
+                            <thead>
+                                <tr>
+                                    <th>Category Name</th>
+                                    <th>Category Description</th>
+                                    <th>Created At</th>
+                                    <th>Last Updated</th>
+                                    <th class="no-sort">Actions</th>
+                                </tr>
+                            </thead>
+
+                            <!-- Footers -->
+                            <tfoot>
+                                <tr>
+                                    <th>Category Name</th>
+                                    <th>Category Description</th>
+                                    <th>Created At</th>
+                                    <th>Last Updated</th>
+                                    <th class="no-sort">Actions</th>
+                                </tr>
+                            </tfoot>
+
+                            <!-- List of Categories -->
+                            <tbody>
+                                <% categories.forEach((category) => { %>
+                                    <tr>
+                                        <td><%= category.catname %></td>
+
+                                        <% if (category.description.length > 100) { 
+                                            category.description = category.description.slice(0, 70) + '...';
+                                        } %>
+                                        <td><%= category.description %></td>
+                                        <td><%= category.created_at %></td>
+                                        <td><%= category.updated_at %></td>
+                                        <td>
+                                            <a href="/dashboard/updatecat/<%= category.categoryid %>" class="btn_1 gray update_prom"
+                                                    style="margin-right: 10px;"> Update</a>
+                                            <a href="/" class="btn_1 gray delete wishlist_close" data-toggle="modal" 
+                                                    data-target="#deleteModal<%= parseInt(category.categoryid) %>"> Delete </a>
+                                        </td>
+                                    </tr>
+                                <% }); %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="card-footer small text-muted">Updated yesterday at 11:59 PM</div>
+            </div>
+            <!-- /tables-->
+        </div>
+        <!-- /container-fluid-->
+    </div>
+    <!-- /container-wrapper-->
+
+    <%- include('partials/footer'); %>
+
+    <!-- Scroll to Top Button-->
+    <a class="scroll-to-top rounded" href="#page-top">
+        <i class="fa fa-angle-up"></i>
+    </a>
+
+
+    <!-- Custom Scripts -->
+    <script src="../assetsAdmin/js/admin-datatables.js"></script>
+
+    <!-- Data Table -->
+    <script src="cdnjs.cloudflare.com/ajax/libs/moment.js/2.8.4/moment.min.js"></script>
+    <script src="cdn.datatables.net/plug-ins/1.10.22/sorting/datetime-moment.js"></script>
+    <script>
+        $('#dataTable').dataTable( {
+            "columnDefs": [ {
+                "targets": 'no-sort',
+                "orderable": false,
+            } ],
+            "columns": [
+                { "width": "14%" },
+                { "width": "38%" },
+                { "width": "15%" },
+                { "width": "15%" },
+                { "width": "18%" }
+            ]
+        } );
+    </script>
+
+    <% categories.forEach((category)=> { %>
+        <!-- Delete Modal -->
+        <div class="modal fade" id="deleteModal<%= parseInt(category.categoryid) %>" tabindex="-1"
+            role="dialog" aria-labelledby="deleteModal<%= parseInt(category.categoryid) %>" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Confirm Deletion</h5>
+                        <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">Select "Delete" below if you wish to delete the <strong><%= category.catname %></strong> category.
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                        <a class="btn btn-primary delete_cat" href="#" data-index="<%= category.categoryid %>" data-name="<%= category.catname %>">Delete</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <% }); %>
+        
+    <!-- Delete Category -->
+    <script>
+        
+        $(document).on('click', '.delete_cat', async function (event) {
+            
+            try {
+                event.preventDefault();
+
+                await axios.delete(`${baseUrl}/category/${parseInt($(this).attr('data-index'))}`, config);
+
+                // store category name to storage so we know the category has been successfully deleted
+                await localStorage.setItem('deletedCat', $(this).attr('data-name'));
+
+                window.location.reload();
+                
+            } catch (err) {
+            
+                // check if it's an axios error
+                if (err.response) {
+                    console.log(err.response.data.Message);
+
+                } else {
+                    // log error
+                    console.log(err);
+                };
+                
+            };
+        });
+
+    </script>
+
+</body>
+
+</html>

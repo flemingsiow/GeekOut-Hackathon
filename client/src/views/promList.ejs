@@ -1,0 +1,250 @@
+<!-- 
+
+		  		  Author:  Fleming Siow
+		   Serial Number:  4
+               	   Class:  DAAA/FT/1B/03
+    	Admission Number:  p2011828
+      	  		    Date:  7th February, 2021
+			    Filename:  promList.ejs
+
+		
+		
+		Displays all unexpired promotions for the games.
+
+-->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<%- include('partials/head'); %>
+	<title>SPGames | Promotion Listings</title>
+</head>
+
+<body>
+	
+	<div id="page" class="theia-exception">
+		
+    <%- include('partials/nav'); %>
+	
+	<main>
+		
+		<section class="hero_in restaurants">
+			<div class="wrapper">
+				<div class="container">
+					<h1 class="fadeInUp"><span></span>Promotion Listings</h1>
+				</div>
+			</div>
+		</section>
+		<!--/hero_in-->
+		
+		<div class="filters_listing sticky_horizontal">
+			<div class="container">
+				<ul class="clearfix">
+					<li>
+						<div class="switch-field">
+							<input type="radio" id="all" name="listing_filter" value="all" checked data-filter="*" class="selected">
+							<label for="all">All</label>
+							<input type="radio" id="popular" name="listing_filter" value="popular" data-filter=".popular">
+							<label for="popular">Popular</label>
+							<input type="radio" id="latest" name="listing_filter" value="latest" data-filter=".latest">
+							<label for="latest">Latest</label>
+						</div>
+					</li>
+					<li>
+						<div class="layout_view">
+							<a href="restaurants-grid-sidebar.html"><i class="icon-th"></i></a>
+							<a href="#0" class="active"><i class="icon-th-list"></i></a>
+						</div>
+					</li>
+				</ul>
+			</div>
+			<!-- /container -->
+		</div>
+		<!-- /filters -->
+		
+		<div class="collapse" id="collapseMap">
+			<div id="map" class="map"></div>
+		</div>
+		<!-- End Map -->
+
+		<div class="container margin_60_35">
+			<div class="row">
+				<aside class="col-lg-3">
+					<div class="custom-search-input-2 inner-2">
+
+						<div class="form-group">
+							<input class="form-control" type="text" placeholder="Search Game...">
+							<i class="icon_search"></i>
+                        </div>
+                        
+						<div class="form-group">
+							<input class="form-control" type="text" placeholder="All Categories">
+							<i class="icon_pin_alt"></i>
+                        </div>
+                        
+						<div class="form-group">
+                            <select class="wide">
+                                <option>All Platforms</option>	
+                            </select>
+                        </div>
+                        
+
+						<input type="submit" class="btn_search" value="Search">
+                    </div>
+                    
+
+					<!-- /custom-search-input-2 -->
+					<div id="filters_col">
+						<a data-toggle="collapse" href="#collapseFilters" aria-expanded="false" aria-controls="collapseFilters" id="filters_col_bt">Filters </a>
+						<div class="collapse show" id="collapseFilters">
+		
+							<div class="filter_type">
+								<h6></h6>
+								 <ul>
+                                    <li>
+                                        <label>Currently Active</label>
+                                        <input type="checkbox" class="js-switch" checked>
+                                    </li>
+                                </ul>
+							</div>
+							
+						</div>
+						<!--/collapse -->
+					</div>
+					<!--/filters col-->
+
+					
+				</aside>
+				<!-- /aside -->
+
+				<div class="col-lg-9">
+					<div class="isotope-wrapper">
+
+                    <% promotions.forEach((promotion) => { %>
+            
+                        <div class="box_list isotope-item popular" style="width: 100%;">
+                            <div class="row no-gutters">
+
+                                <div class="col-lg-5">
+                                    <figure style="background: black;">
+                                        <small><%= promotion.title %></small>
+                                        <a href="/gamedetails/<%= promotion.gameid %>">
+                                            <img src="/assets/img/uploads/<%= promotion.prompic.split('/').pop() %>" 
+												style="opacity: 0.9;"
+                                                class="img-fluid" alt="<%= promotion.promname %>" width="800" height="533">
+                                            <div class="read_more"><span>Read more</span></div>
+                                        </a>
+                                    </figure>
+                                </div>
+
+                                <div class="col-lg-7">
+                                    <div class="wrapper">
+                                        <h3><a href="/gamedetails/<%= promotion.gameid %>"><%= promotion.promname %></a></h3>
+                                        <span class="price"><%= promotion.avalFrom %> – <%= promotion.avalTo %></span>
+                                    </div>
+                                    <ul>
+                                        <li><i class="ti-eye"></i> <small>Posted On</small> <%= promotion.created_at %></li>
+                                        <li><div class="score"><strong><%= promotion.discount*100 %>% OFF</strong></div></li>
+                                    </ul>
+                                </div>
+
+                            </div>
+                        </div>
+
+                    <% }); %>
+					
+                    
+
+					</div>
+					<!-- /isotope-wrapper -->
+			
+					<nav aria-label="..." class="row justify-content-md-center">
+						<ul class="pagination pagination-sm">
+							<% if (pagination.previousPage) { %>
+								<li class="page-item">
+									<a class="page-link" href="/promotions?page=<%= parseInt(pagination.currentPage) - 1 %>" 
+										tabindex="-1">Previous</a>
+								</li>
+							<% } else if (pagination.totalResults !== 0) { %>
+								<li class="page-item disabled">
+									<a class="page-link" href="#" tabindex="-1">Previous</a>
+								</li>
+							<% }; %>
+	
+							<% for(i = 1; i <= parseInt(pagination.totalPages); i++) { 
+								
+								if (parseInt(pagination.currentPage) === i) { %>
+									<li class="page-item active"><a class="page-link" href="/promotions?page=<%= i %>"><%= i %></a></li>
+							<% } else { %>
+									<li class="page-item"><a class="page-link" href="/promotions?page=<%= i %>"><%= i %></a></li>
+							<% }; 
+							}; %>
+	
+							<% if (pagination.nextPage) { %>
+								<li class="page-item">
+									<a class="page-link" href="/promotions?page=<%= parseInt(pagination.currentPage) + 1 %>"
+										tabindex="-1">Next</a>
+								</li>
+							<% } else if (pagination.totalResults !== 0) { %>
+								<li class="page-item disabled">
+									<a class="page-link" href="#">Next</a>
+								</li>
+							<% }; %>
+						</ul>
+					</nav>
+				</div>
+				<!-- /col -->
+			</div>		
+		</div>
+		<!-- /container -->
+		
+		<div class="bg_color_1">
+            <div class="container margin_60_35">
+                <div class="row">
+                    <div class="col-md-4">
+                        <a href="/contact" class="boxed_list">
+                            <i class="pe-7s-help2"></i>
+                            <h4>Need Help? Contact us</h4>
+                        </a>
+                    </div>
+                    <div class="col-md-4">
+                        <a href="/cart" class="boxed_list">
+                            <i class="pe-7s-wallet"></i>
+                            <h4>Payments</h4>
+                        </a>
+                    </div>
+                    <div class="col-md-4">
+                        <a href="/" class="boxed_list">
+                            <i class="pe-7s-note2"></i>
+                            <h4>Cancel Policy</h4>
+                        </a>
+                    </div>
+                </div>
+                <!-- /row -->
+            </div>
+            <!-- /container -->
+        </div>
+        <!-- /bg_color_1 -->
+        
+
+	</main>
+	<!--/main-->
+	
+	<%- include('partials/footer'); %>
+	</div>
+	<!-- page -->	
+	
+	<script>
+        $(window).on('load', function(){
+        	var $container = $('.isotope-wrapper');
+        	$container.isotope({ itemSelector: '.isotope-item', layoutMode: 'masonry' });
+        });
+        $('.filters_listing').on( 'click', 'input', 'change', function(){
+        	var selector = $(this).attr('data-filter');
+        	$('.isotope-wrapper').isotope({ filter: selector });
+        });
+	</script>
+    
+  
+</body>
+</html>
